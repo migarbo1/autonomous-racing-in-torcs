@@ -60,7 +60,7 @@ import os
 import time
 PI= 3.14159265359
 
-data_size = 2**17
+data_size = 1024
 
 # Initialize help messages
 ophelp=  'Options:\n'
@@ -116,10 +116,7 @@ def bargraph(x,mn,mx,w,c='X'):
     return '[%s]' % (nnc+npc+ppc+pnc)
 
 class Client():
-    def __init__(self,H=None,p=None,i=None,e=None,t=None,s=None,d=None,vision=False):
-        # If you don't like the option defaults,  change them here.
-        self.vision = vision
-
+    def __init__(self,H=None,p=None,i=None,e=None,t=None,s=None,d=None):
         self.host= 'localhost'
         self.port= 3001
         self.sid= 'SCR'
@@ -148,14 +145,11 @@ class Client():
             print('Error: Could not create socket...')
             sys.exit(-1)
         # == Initialize Connection To Server ==
-        self.so.settimeout(1)
+        self.so.settimeout(2)
         n_fail = 5
         while True:
             # This string establishes track sensor angles! You can customize them.
-            #a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"
-            # xed- Going to try something a bit more aggressive...
-            a= "-45 -19 -12 -7 -4 -2.5 -1.7 -1 -.5 0 .5 1 1.7 2.5 4 7 12 19 45"
-
+            a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"
             initmsg='%s(init %s)' % (self.sid,a)
 
             try:
@@ -173,10 +167,7 @@ class Client():
                     print("relaunch torcs")
                     os.system('pkill torcs')
                     time.sleep(1.0)
-                    if self.vision is False:
-                        os.system('torcs -nofuel -nodamage -nolaptime &')
-                    else:
-                        os.system('torcs -nofuel -nodamage -nolaptime -vision &')
+                    os.system('torcs -nofuel -nodamage -nolaptime &')
 
                     time.sleep(1.0)
                     os.system('sh autostart.sh')
@@ -301,9 +292,6 @@ class ServerState():
             self.d[w[0]]= destringify(w[1:])
 
     def __repr__(self):
-        # Comment the next line for raw output:
-        return self.fancyout()
-        # -------------------------------------
         out= str()
         for k in sorted(self.d):
             strout= str(self.d[k])
@@ -529,7 +517,7 @@ def drive_example(c):
     '''This is only an example. It will get around the track but the
     correct thing to do is write your own `drive()` function.'''
     S,R= c.S.d,c.R.d
-    target_speed=100
+    target_speed=200
 
     # Steer To Corner
     R['steer']= S['angle']*10 / PI
@@ -550,17 +538,17 @@ def drive_example(c):
        R['accel']-= .2
 
     # Automatic Transmission
-    R['gear']=1
-    if S['speedX']>50:
-        R['gear']=2
-    if S['speedX']>80:
-        R['gear']=3
-    if S['speedX']>110:
-        R['gear']=4
-    if S['speedX']>140:
-        R['gear']=5
-    if S['speedX']>170:
-        R['gear']=6
+    #R['gear']=1
+    # if S['speedX']>50:
+        # R['gear']=2
+    # if S['speedX']>80:
+        # R['gear']=3
+    # if S['speedX']>110:
+        # R['gear']=4
+    # if S['speedX']>140:
+        # R['gear']=5
+    # if S['speedX']>170:
+        # R['gear']=6
     return
 
 # ================ MAIN ================

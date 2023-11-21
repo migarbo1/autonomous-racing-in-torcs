@@ -3,7 +3,7 @@ import numpy as np
 import random
 
 episode_count = 10
-max_steps = 50
+max_steps = 2000
 reward = 0
 done = False
 step = 0
@@ -13,8 +13,8 @@ env = TorcsEnv()
 
 def get_action_object():
     return {
-        'accel': random.uniform(0, 1),
-        'brake': 0,
+        'accel': random.uniform(0.7, 1),
+        'brake': random.uniform(0, 0.2),
         'steering': random.uniform(-1, 1)
     }
 
