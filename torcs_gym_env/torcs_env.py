@@ -27,17 +27,17 @@ class TorcsEnv:
 
         restart_torcs()
 
-        # Action order:[Accel, Brake, Steering]  
-        action_lows = np.array([0.0, 0.0, -1.0])
-        action_highs = np.array([1.0, 1.0, 1.0])
-        self.action_space = spaces.Box(low=action_lows, high=action_highs)
+    #     # Action order:[Accel, Brake, Steering]  
+    #     action_lows = np.array([0.0, 0.0, -1.0])
+    #     action_highs = np.array([1.0, 1.0, 1.0])
+    #     self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-       # Observation order:[Angle, focus(5), speedX, speedY, speedZ, track(19), trackPos]  
-        observation_lows = np.array([-PI, -1, -np.inf, -np.inf, -np.inf, -1, np.inf], dtype='float')
-        observation_highs = np.array([PI, 200, np.inf, np.inf, np.inf, 200, np.inf], dtype='float')
-        self.observation_space = spaces.Box(low=observation_lows, high=observation_highs, shape=(1, 5, 1, 1, 1, 19, 1))
+    #    # Observation order:[Angle, focus(5), speedX, speedY, speedZ, track(19), trackPos]  
+    #     observation_lows = np.array([-PI, -1, -np.inf, -np.inf, -np.inf, -1, np.inf], dtype='float')
+    #     observation_highs = np.array([PI, 200, np.inf, np.inf, np.inf, 200, np.inf], dtype='float')
+    #     self.observation_space = spaces.Box(low=observation_lows, high=observation_highs, shape=(1, 5, 1, 1, 1, 19, 1))
 
-        self.client = snakeoil.Client(p=3001, vision=self.vision)
+        self.client = snakeoil.Client(p=3001)
         self.time_step = 0
         self.max_speed = 330.
 

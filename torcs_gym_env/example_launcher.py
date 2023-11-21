@@ -1,5 +1,6 @@
 from torcs_env import TorcsEnv
 import numpy as np
+import random
 
 episode_count = 10
 max_steps = 50
@@ -10,25 +11,25 @@ step = 0
 # Generate a Torcs environment
 env = TorcsEnv()
 
-agent = Agent(1)  # steering only
-
+def get_action_object():
+    return {
+        'accel': random.uniform(0, 1),
+        'brake': 0,
+        'steering': random.uniform(-1, 1)
+    }
 
 print("TORCS Experiment Start.")
 for i in range(episode_count):
     print("Episode : " + str(i))
 
-    if np.mod(i, 3) == 0:
-        # Sometimes you need to relaunch TORCS because of the memory leak error
-        ob = env.reset(relaunch=True)
-    else:
-        ob = env.reset()
+    state = env.reset()
 
     total_reward = 0.
     for j in range(max_steps):
-        action = agent.act(ob, reward, done, vision)
+        action = get_action_object()
        # print('action: ', action)
         ob, reward, done, _ = env.step(action)
-       # print('state:', ob)
+        print('state:', ob)
         total_reward += reward
 
         step += 1
@@ -39,5 +40,5 @@ for i in range(episode_count):
     print("Total Step: " + str(step))
     print("")
 
-env.end()  # This is for shutting down TORCS
+env.kill_torcs()  # This is for shutting down TORCS
 print("Finish.")
