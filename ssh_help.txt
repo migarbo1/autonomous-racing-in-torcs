@@ -1,0 +1,4 @@
+1. eval "$(ssh-agent -s)"
+
+2. ssh-add ~/.ssh/id_ed25519
+

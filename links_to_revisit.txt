@@ -1,0 +1,10 @@
+1. https://github.com/A-Raafat/Torcs---Reinforcement-Learning-using-Q-Learning
+2. https://github.com/zsdonghao/Imitation-Learning-Dagger-Torcs
+3. https://github.com/abhisheknaik96/MultiAgentTORCS
+4. https://github.com/CPS-TUWien/racing_dreamer/
+5. https://github.com/axelbr/racecar_gym/
+
+Not working
+6. https://github.com/ugo-nama-kun/gym_torcs/
+7. https://github.com/dosssman/GymTorcs/tree/master
+
