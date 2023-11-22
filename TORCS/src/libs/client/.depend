@@ -1,7 +1,8 @@
 entry.o: entry.cpp /usr/include/stdc-predef.h \
- /home/miguel/Documentos/TORCS/export/include/client.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h /usr/include/stdio.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/client.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
+ /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -137,7 +138,7 @@ entry.o: entry.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -157,10 +158,10 @@ entry.o: entry.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
  /usr/include/plib/ssg.h /usr/include/plib/sg.h \
  /usr/include/plib/ssgconf.h mainmenu.h splash.h \
- /home/miguel/Documentos/TORCS/export/include/musicplayer/musicplayer.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/musicplayer/musicplayer.h
 mainmenu.o: mainmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -185,8 +186,8 @@ mainmenu.o: mainmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
@@ -299,7 +300,7 @@ mainmenu.o: mainmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -319,10 +320,10 @@ mainmenu.o: mainmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/singleplayer.h \
- /home/miguel/Documentos/TORCS/export/include/driverconfig.h mainmenu.h \
- exitmenu.h optionmenu.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/singleplayer.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/driverconfig.h \
+ mainmenu.h exitmenu.h optionmenu.h
 splash.o: splash.cpp /usr/include/stdc-predef.h /usr/include/GL/glut.h \
  /usr/include/GL/freeglut_std.h /usr/include/GL/gl.h \
  /usr/include/GL/glext.h /usr/include/KHR/khrplatform.h \
@@ -385,11 +386,11 @@ splash.o: splash.cpp /usr/include/stdc-predef.h /usr/include/GL/glut.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
  /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/config.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -469,7 +470,7 @@ splash.o: splash.cpp /usr/include/stdc-predef.h /usr/include/GL/glut.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/plib/js.h /usr/include/plib/ul.h /usr/include/ctype.h \
  /usr/include/dlfcn.h /usr/include/x86_64-linux-gnu/bits/dlfcn.h \
  /usr/include/x86_64-linux-gnu/bits/dl_find_object.h /usr/include/fcntl.h \
@@ -483,7 +484,7 @@ splash.o: splash.cpp /usr/include/stdc-predef.h /usr/include/GL/glut.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
  splash.h mainmenu.h
 exitmenu.o: exitmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -509,8 +510,8 @@ exitmenu.o: exitmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
@@ -623,7 +624,7 @@ exitmenu.o: exitmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -643,7 +644,7 @@ exitmenu.o: exitmenu.cpp /usr/include/stdc-predef.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
  exitmenu.h mainmenu.h
 optionmenu.o: optionmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/stdio.h \
@@ -670,8 +671,8 @@ optionmenu.o: optionmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
@@ -784,7 +785,7 @@ optionmenu.o: optionmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -804,8 +805,9 @@ optionmenu.o: optionmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- optionmenu.h /home/miguel/Documentos/TORCS/export/include/graphconfig.h \
- /home/miguel/Documentos/TORCS/export/include/simuconfig.h \
- /home/miguel/Documentos/TORCS/export/include/soundconfig.h \
- /home/miguel/Documentos/TORCS/export/include/openglconfig.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ optionmenu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphconfig.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simuconfig.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/soundconfig.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/openglconfig.h

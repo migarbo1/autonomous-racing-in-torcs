@@ -614,6 +614,21 @@ ReOneStep(double deltaTimeIncrement)
 	int i;
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
+	
+	bool restartRequested = false;
+
+	for(i = 0; i < s->_ncars;i++){
+		if(s->cars[i]->ctrl.askRestart){
+			restartRequested = true;
+			s->cars[i]->ctrl.askRestart = false;
+		}
+	}
+
+	if(restartRequested){
+		ReRaceCleanup();
+		ReInfo->_reState = RE_STATE_PRE_RACE;
+		GfuiScreenActivate(ReInfo->_reGameScreen);
+	}
 
 	//if ((ReInfo->_displayMode != RM_DISP_MODE_NONE) && (ReInfo->_displayMode != RM_DISP_MODE_CONSOLE)) {
 	//	if (floor(s->currentTime) == -2.0) {

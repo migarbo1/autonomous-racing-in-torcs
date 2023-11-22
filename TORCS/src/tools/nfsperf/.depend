@@ -58,7 +58,7 @@ mainnfsperf.o: mainnfsperf.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/bits/std_abs.h /usr/include/getopt.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_ext.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -138,4 +138,4 @@ mainnfsperf.o: mainnfsperf.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h

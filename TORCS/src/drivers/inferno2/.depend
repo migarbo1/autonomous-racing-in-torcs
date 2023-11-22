@@ -93,7 +93,7 @@ inferno2.o: inferno2.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -136,14 +136,14 @@ inferno2.o: inferno2.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/param.h \
  /usr/include/asm-generic/param.h /usr/include/assert.h \
  /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
  /usr/include/plib/sg.h /usr/include/plib/ul.h /usr/include/ctype.h \
  /usr/include/dlfcn.h /usr/include/x86_64-linux-gnu/bits/dlfcn.h \
  /usr/include/x86_64-linux-gnu/bits/dl_find_object.h /usr/include/fcntl.h \
@@ -157,13 +157,14 @@ inferno2.o: inferno2.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/robottools.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h common.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robottools.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h \
+ common.h
 common.o: common.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -259,7 +260,7 @@ common.o: common.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -302,14 +303,14 @@ common.o: common.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/param.h \
  /usr/include/asm-generic/param.h /usr/include/assert.h \
  /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
  /usr/include/plib/sg.h /usr/include/plib/ul.h /usr/include/ctype.h \
  /usr/include/dlfcn.h /usr/include/x86_64-linux-gnu/bits/dlfcn.h \
  /usr/include/x86_64-linux-gnu/bits/dl_find_object.h /usr/include/fcntl.h \
@@ -323,8 +324,9 @@ common.o: common.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/robottools.h common.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robottools.h \
+ common.h

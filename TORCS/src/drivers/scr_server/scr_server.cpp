@@ -573,6 +573,8 @@ if (RESTARTING[index]==0)
         if (carCtrl.getMeta()==RACE_RESTART)
         {
          	RESTARTING[index] = 1;
+		car->ctrl.askRestart = true;
+		std::cerr << "Restarting the race" << endl;
 #ifdef __DISABLE_RESTART__
 	        char line[UDP_MSGLEN];
         	sprintf(line,"***restart***");

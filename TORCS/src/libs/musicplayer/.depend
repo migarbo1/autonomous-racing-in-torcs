@@ -52,7 +52,7 @@ OggSoundStream.o: OggSoundStream.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h SoundStream.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -143,7 +143,7 @@ OggSoundStream.o: OggSoundStream.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h
 OpenALMusicPlayer.o: OpenALMusicPlayer.cpp /usr/include/stdc-predef.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -169,7 +169,7 @@ OpenALMusicPlayer.o: OpenALMusicPlayer.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
@@ -282,7 +282,7 @@ OpenALMusicPlayer.o: OpenALMusicPlayer.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  OpenALMusicPlayer.h /usr/include/AL/al.h /usr/include/AL/alc.h \
  SoundStream.h
 musicplayer.o: musicplayer.cpp /usr/include/stdc-predef.h musicplayer.h \
@@ -340,8 +340,8 @@ musicplayer.o: musicplayer.cpp /usr/include/stdc-predef.h musicplayer.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/11/bits/std_abs.h /usr/include/string.h \
  /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
+ /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
@@ -429,10 +429,11 @@ musicplayer.o: musicplayer.cpp /usr/include/stdc-predef.h musicplayer.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h OggSoundStream.h \
- /usr/include/vorbis/vorbisfile.h /usr/include/vorbis/codec.h \
- /usr/include/ogg/ogg.h /usr/include/ogg/os_types.h \
- /usr/include/ogg/config_types.h /usr/include/inttypes.h SoundStream.h \
- OpenALMusicPlayer.h /usr/include/AL/al.h /usr/include/AL/alc.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h \
+ OggSoundStream.h /usr/include/vorbis/vorbisfile.h \
+ /usr/include/vorbis/codec.h /usr/include/ogg/ogg.h \
+ /usr/include/ogg/os_types.h /usr/include/ogg/config_types.h \
+ /usr/include/inttypes.h SoundStream.h OpenALMusicPlayer.h \
+ /usr/include/AL/al.h /usr/include/AL/alc.h

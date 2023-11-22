@@ -55,8 +55,8 @@ trackselect.o: trackselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -137,7 +137,7 @@ trackselect.o: trackselect.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -157,21 +157,21 @@ trackselect.o: trackselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 driverselect.o: driverselect.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -244,8 +244,8 @@ driverselect.o: driverselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -326,7 +326,7 @@ driverselect.o: driverselect.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -345,22 +345,22 @@ driverselect.o: driverselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 results.o: results.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -418,8 +418,8 @@ results.o: results.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -500,7 +500,7 @@ results.o: results.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -520,23 +520,23 @@ results.o: results.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robottools.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robottools.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 pitmenu.o: pitmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -585,9 +585,9 @@ pitmenu.o: pitmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/11/bits/std_abs.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
+ /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
@@ -676,7 +676,7 @@ pitmenu.o: pitmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -696,21 +696,21 @@ pitmenu.o: pitmenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h
 loadingscreen.o: loadingscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -759,9 +759,9 @@ loadingscreen.o: loadingscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/11/bits/std_abs.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
+ /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
@@ -850,7 +850,7 @@ loadingscreen.o: loadingscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -870,14 +870,14 @@ loadingscreen.o: loadingscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h
 racemenu.o: racemenu.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
@@ -936,8 +936,8 @@ racemenu.o: racemenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -1018,7 +1018,7 @@ racemenu.o: racemenu.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -1038,22 +1038,22 @@ racemenu.o: racemenu.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 miscscreens.o: miscscreens.cpp /usr/include/stdc-predef.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
@@ -1079,8 +1079,8 @@ miscscreens.o: miscscreens.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
@@ -1193,7 +1193,7 @@ miscscreens.o: miscscreens.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -1213,22 +1213,22 @@ miscscreens.o: miscscreens.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/robot.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robot.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 fileselect.o: fileselect.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -1301,8 +1301,8 @@ fileselect.o: fileselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
  /usr/include/x86_64-linux-gnu/sys/param.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
@@ -1383,7 +1383,7 @@ fileselect.o: fileselect.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -1402,19 +1402,19 @@ fileselect.o: fileselect.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h
 carsetupscreen.o: carsetupscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -1463,9 +1463,9 @@ carsetupscreen.o: carsetupscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/11/bits/std_abs.h \
- /home/miguel/Documentos/TORCS/export/include/tgfclient.h \
- /home/miguel/Documentos/TORCS/export/include/tgf.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgfclient.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tgf.h \
+ /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
@@ -1554,7 +1554,7 @@ carsetupscreen.o: carsetupscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/osspec.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/osspec.h \
  /usr/include/GL/glut.h /usr/include/GL/freeglut_std.h \
  /usr/include/GL/gl.h /usr/include/GL/glext.h \
  /usr/include/KHR/khrplatform.h \
@@ -1574,22 +1574,22 @@ carsetupscreen.o: carsetupscreen.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /home/miguel/Documentos/TORCS/export/include/screen_properties.h \
- /home/miguel/Documentos/TORCS/export/include/car.h \
- /home/miguel/Documentos/TORCS/export/include/track.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/linalg_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v2_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v3_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/v4_t.h \
- /home/miguel/Documentos/TORCS/export/include/tmath/straight2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/screen_properties.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/car.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/track.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/linalg_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v2_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v3_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/v4_t.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/tmath/straight2_t.h \
  /usr/include/plib/sg.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
- /home/miguel/Documentos/TORCS/config.h \
- /home/miguel/Documentos/TORCS/export/include/racescreens.h \
- /home/miguel/Documentos/TORCS/export/include/raceman.h \
- /home/miguel/Documentos/TORCS/export/include/graphic.h \
- /home/miguel/Documentos/TORCS/export/include/simu.h \
- /home/miguel/Documentos/TORCS/export/include/robottools.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/racescreens.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/raceman.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/graphic.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/simu.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/robottools.h \
  /usr/include/c++/11/vector /usr/include/c++/11/bits/allocator.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h \
  /usr/include/c++/11/ext/new_allocator.h /usr/include/c++/11/new \

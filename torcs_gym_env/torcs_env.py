@@ -1,8 +1,6 @@
 #imports
 import snakeoil3_gym as snakeoil
 from snakeoil3_gym import PI
-from gymnasium import spaces
-import gymnasium as gym
 import numpy as np
 import collections
 import logging
@@ -17,7 +15,7 @@ def restart_torcs():
     time.sleep(0.5)
     os.system('torcs -nofuel -nodamage &')
     time.sleep(0.5)
-    os.system('sh autostart.sh')
+    os.system('sh autostart_race.sh')
     time.sleep(0.5)
 
 
@@ -26,16 +24,6 @@ class TorcsEnv:
     def __init__(self, create_client = False) -> None:
 
         restart_torcs()
-
-    #     # Action order:[Accel, Brake, Steering]  
-    #     action_lows = np.array([0.0, 0.0, -1.0])
-    #     action_highs = np.array([1.0, 1.0, 1.0])
-    #     self.action_space = spaces.Box(low=action_lows, high=action_highs)
-
-    #    # Observation order:[Angle, focus(5), speedX, speedY, speedZ, track(19), trackPos]  
-    #     observation_lows = np.array([-PI, -1, -np.inf, -np.inf, -np.inf, -1, np.inf], dtype='float')
-    #     observation_highs = np.array([PI, 200, np.inf, np.inf, np.inf, 200, np.inf], dtype='float')
-    #     self.observation_space = spaces.Box(low=observation_lows, high=observation_highs, shape=(1, 5, 1, 1, 1, 19, 1))
 
         self.client = snakeoil.Client(p=3001) if create_client else None
         self.time_step = 0
@@ -80,14 +68,14 @@ class TorcsEnv:
     def reset(self):
         self.time_step = 0
 
-        # if self.client:
-        #     self.client.R.d['meta'] = True
-        #     self.client.respond_to_server()
+        if self.client:
+            self.client.R.d['meta'] = 1
+            self.client.respond_to_server()
 
-        #     # TO avoid memory leak re-launch torcs from time to time
-        #     if random.uniform(0,1) < 0.33:
-        #         restart_torcs()
-        restart_torcs()
+            # TO avoid memory leak re-launch torcs from time to time
+            if random.random() < 0.25:
+               restart_torcs()
+        
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
 

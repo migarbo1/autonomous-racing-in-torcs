@@ -167,7 +167,7 @@ class Client():
                     print("relaunch torcs")
                     os.system('pkill torcs')
                     time.sleep(1.0)
-                    os.system('torcs -nofuel -nodamage -nolaptime &')
+                    os.system('torcs -nofuel -nodamage &')
 
                     time.sleep(1.0)
                     os.system('sh autostart.sh')
@@ -558,4 +558,5 @@ if __name__ == "__main__":
         C.get_servers_input()
         drive_example(C)
         C.respond_to_server()
+
     C.shutdown()

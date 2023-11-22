@@ -33,6 +33,30 @@ sudo make install
 #go to torcs/src/libs/raceengine/raceengine.ccp
 #and comment lines 619~625 to avoid countdown
 
+# add patch to restart races -> doc in here: https://github.com/Gastd/scr-meta-restart/tree/master
+# in torcs/src/drivers/scr_server/scr_server.cpp before '#ifdef __DISABLE_RESTART__' add:
+	car->ctrl.askRestart = true;
+	std::cerr << "Restarting the race" << endl;
+
+#in torcs/src/libs/raceengine/raceengine.cpp before the commented countdown add:
+	bool restartRequested = false;
+
+	for(i = 0; i < s->_ncars;i++){
+		if(s->cars[i]->ctrl.askRestart){
+			restartRequested = true;
+			s->cars[i]->ctrl.askRestart = false;
+		}
+	}
+
+	if(restartRequested){
+		ReRaceCleanup();
+		ReInfo->_reState = RE_STATE_PRE_RACE;
+		GfuiScreenActivate(ReInfo->_reGameScreen);
+	}
+
+#in torcs/src/interfaces/car.h before '} tCarCtrl;' add:
+    int		askRestart;
+
 #compile and install torcs
 
 make 
@@ -76,7 +100,7 @@ vim default.xml
 		<attnum name="angle" unit="deg"  min="0" max="35" val="10"/>
 	</section>
 		
-	<<section name="Gearbox">
+	<section name="Gearbox">
 		<attnum name="shift time" val="0.05" unit="s"/>
 		<section name="gears">
 			<section name="r">

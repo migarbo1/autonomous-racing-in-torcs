@@ -1,2 +1,2 @@
-TORCS_BASE = /home/miguel/Documentos/TORCS
-MAKE_DEFAULT = /home/miguel/Documentos/TORCS/Make-default.mk
+TORCS_BASE = /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS
+MAKE_DEFAULT = /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/Make-default.mk

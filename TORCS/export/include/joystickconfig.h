@@ -1,1 +1,1 @@
-/home/miguel/Documentos/TORCS/src/libs/confscreens/joystickconfig.h
+/home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/src/libs/confscreens/joystickconfig.h

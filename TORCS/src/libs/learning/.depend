@@ -16,9 +16,9 @@ policy.o: policy.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
  /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/export/include/learning/learn_debug.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h \
- /home/miguel/Documentos/TORCS/export/include/learning/policy.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/learn_debug.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/policy.h \
  /usr/include/c++/11/cmath /usr/include/c++/11/bits/cpp_type_traits.h \
  /usr/include/c++/11/ext/type_traits.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
@@ -97,16 +97,16 @@ policy.o: policy.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/learning/ANN.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/ANN.h \
  /usr/include/assert.h /usr/include/c++/11/stdlib.h \
  /usr/include/c++/11/math.h \
- /home/miguel/Documentos/TORCS/export/include/learning/string_utils.h \
- /home/miguel/Documentos/TORCS/export/include/learning/List.h \
- /home/miguel/Documentos/TORCS/export/include/learning/Distribution.h \
- /home/miguel/Documentos/TORCS/export/include/learning/MathFunctions.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/string_utils.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/List.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/Distribution.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/MathFunctions.h
 ann_policy.o: ann_policy.cpp /usr/include/stdc-predef.h \
- /home/miguel/Documentos/TORCS/export/include/learning/ann_policy.h \
- /home/miguel/Documentos/TORCS/export/include/learning/policy.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/ann_policy.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/policy.h \
  /usr/include/c++/11/cmath \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -201,16 +201,16 @@ ann_policy.o: ann_policy.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /home/miguel/Documentos/TORCS/export/include/learning/ANN.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/ANN.h \
  /usr/include/assert.h /usr/include/c++/11/stdlib.h \
  /usr/include/c++/11/math.h \
- /home/miguel/Documentos/TORCS/export/include/learning/learn_debug.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h \
- /home/miguel/Documentos/TORCS/export/include/learning/string_utils.h \
- /home/miguel/Documentos/TORCS/export/include/learning/List.h \
- /home/miguel/Documentos/TORCS/export/include/learning/Distribution.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/learn_debug.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/string_utils.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/List.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/Distribution.h
 List.o: List.cpp /usr/include/stdc-predef.h \
- /home/miguel/Documentos/TORCS/export/include/learning/List.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/List.h \
  /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -267,10 +267,10 @@ List.o: List.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h /usr/include/assert.h \
- /home/miguel/Documentos/TORCS/export/include/learning/learn_debug.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/learn_debug.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h
 string_utils.o: string_utils.cpp /usr/include/stdc-predef.h \
- /home/miguel/Documentos/TORCS/export/include/learning/string_utils.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/string_utils.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -328,11 +328,11 @@ string_utils.o: string_utils.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/c++/11/bits/std_abs.h \
- /home/miguel/Documentos/TORCS/export/include/learning/learn_debug.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h \
- /home/miguel/Documentos/TORCS/export/include/portability.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/learn_debug.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/portability.h \
  /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/config.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/config.h
 Distribution.o: Distribution.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/cstdio \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -428,11 +428,11 @@ Distribution.o: Distribution.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/learning/Distribution.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/Distribution.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h
 MathFunctions.o: MathFunctions.cpp /usr/include/stdc-predef.h \
- /home/miguel/Documentos/TORCS/export/include/learning/MathFunctions.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/MathFunctions.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h \
  /usr/include/c++/11/cmath \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -535,7 +535,7 @@ ANN.o: ANN.cpp /usr/include/stdc-predef.h /usr/include/c++/11/cstring \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
  /usr/include/strings.h \
- /home/miguel/Documentos/TORCS/export/include/learning/ANN.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/ANN.h \
  /usr/include/assert.h /usr/include/stdio.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
@@ -615,8 +615,8 @@ ANN.o: ANN.cpp /usr/include/stdc-predef.h /usr/include/c++/11/cstring \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /home/miguel/Documentos/TORCS/export/include/learning/learn_debug.h \
- /home/miguel/Documentos/TORCS/export/include/learning/real.h \
- /home/miguel/Documentos/TORCS/export/include/learning/string_utils.h \
- /home/miguel/Documentos/TORCS/export/include/learning/List.h \
- /home/miguel/Documentos/TORCS/export/include/learning/Distribution.h
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/learn_debug.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/real.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/string_utils.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/List.h \
+ /home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/export/include/learning/Distribution.h
