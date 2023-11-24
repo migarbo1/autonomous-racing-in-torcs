@@ -1,5 +1,5 @@
 from torch.distributions import MultivariateNormal
-from network import FeedForwardNN
+from .network import FeedForwardNN
 from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
@@ -10,7 +10,7 @@ class PPO:
     def __init__(self, env) -> None:
         # Set hyperparameters
         self._init_hyperparameters()
-
+        
         # Get enviroment information
         self.env = env
         self.obs_dim = env.observation_space.shape[0]

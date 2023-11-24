@@ -1,6 +1,5 @@
 #imports
-import snakeoil3_gym as snakeoil
-from snakeoil3_gym import PI
+from . import snakeoil3_gym as snakeoil
 from gymnasium import spaces
 import numpy as np
 import collections
@@ -9,6 +8,7 @@ import random
 import time
 import os
 
+PI = snakeoil.PI
 
 def restart_torcs():
     logging.log(0, 'Killing torcs and re-launching...')
@@ -16,7 +16,7 @@ def restart_torcs():
     time.sleep(0.5)
     os.system('torcs -nofuel -nodamage &')
     time.sleep(0.5)
-    os.system('sh autostart_race.sh')
+    os.system('sh ~/Documentos/autonomous-racing-in-torcs/torcs_python_client/autostart_race.sh')
     time.sleep(0.5)
 
 
@@ -46,6 +46,9 @@ class TorcsEnv:
         # to think: how to smoothen steering movements -> if now it is -1 and action tells 0... ¿place in value function?  
         done = False
 
+        if isinstance(actions, np.ndarray):
+            actions = self.action_array2dict(actions)
+
         # set action dict to the selected actions by network
         for k, v in actions.items():
             self.client.R.d[k] = v
@@ -58,7 +61,6 @@ class TorcsEnv:
 
         # Get the response of TORCS
         self.client.get_servers_input()
-        print(self.client.S)
         self.observation = self.parse_torcs_input(self.client.S.d)
         
         #TODO:
@@ -74,7 +76,7 @@ class TorcsEnv:
         
         self.time_step += 1
 
-        return self.observation, reward, done, None # last item to compy with gym syntax
+        return self.observation2array(self.observation), reward, done, None, None # last Nones to compy with gym syntax
 
     
     def reset(self):
@@ -92,8 +94,9 @@ class TorcsEnv:
         self.client.MAX_STEPS = np.inf
 
         self.observation = self.client.get_servers_input()
+        print('reset:', self.observation)
 
-        return self.observation
+        return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
 
 
     def compute_gear(self, speed):
@@ -113,6 +116,27 @@ class TorcsEnv:
         return gear
 
 
+    def observation2array(self, observation):
+        res = []
+        res.append(getattr(observation,'angle'))
+        res = res + list(getattr(observation, 'focus'))
+        res.append(getattr(observation, 'speedX'))
+        res.append(getattr(observation, 'speedY'))
+        res.append(getattr(observation, 'speedZ'))
+        res = res + list(getattr(observation, 'track'))
+        res.append(getattr(observation, 'trackPos'))
+        print(res)
+        return np.array(res)
+
+
+    def action_array2dict(self, actions):
+        res = {
+            'accel': actions[0],
+            'brake': actions[1],
+            'steering': actions[2]
+            }
+        return res
+
 
     def kill_torcs(self):
         os.system(f'pkill torcs')
@@ -121,7 +145,6 @@ class TorcsEnv:
     def parse_torcs_input(self, obs_dict: dict):
         keys = ['angle', 'focus', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
         observation = collections.namedtuple('observation', keys)
-        print(observation._fields)
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
             focus=np.array(obs_dict['focus'], dtype=np.float32)/200.,

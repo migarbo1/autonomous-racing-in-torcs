@@ -222,7 +222,9 @@ class Client():
 
     def get_servers_input(self):
         '''Server's input is stored in a ServerState object'''
-        if not self.so: return
+        if not self.so: 
+            print('*******************not socket**************************')
+            return
         sockdata= str()
 
         while True:
@@ -231,6 +233,7 @@ class Client():
                 sockdata,addr= self.so.recvfrom(data_size)
                 sockdata = sockdata.decode('utf-8')
             except socket.error as emsg:
+                print('error in reading socket')
                 print('.', end=' ')
                 #print "Waiting for data on %d.............." % self.port
             if '***identified***' in sockdata:
@@ -255,7 +258,9 @@ class Client():
                 if self.debug:
                     sys.stderr.write("\x1b[2J\x1b[H") # Clear for steady output.
                     print(self.S)
+                print('get_server_imput after parse_server', self.S.d)
                 break # Can now return from this function.
+        return self.S.d
 
     def respond_to_server(self):
         if not self.so: return
