@@ -7,7 +7,7 @@ git clone https://github.com/ugo-nama-kun/gym_torcs.git
 cd gym_torcs/vtorcs-RL-color
 
 #install dependencies:
-sudo apt-get install mesa-utils libalut-dev libvorbis-dev cmake libxrender-dev libxrender1 libxrandr-dev zlib1g-dev libpng-dev
+sudo apt-get install mesa-utils libalut-dev libvorbis-dev cmake libxrender-dev libxrender1 libxrandr-dev zlib1g-dev libpng-dev libxxf86vm-dev
 
 sudo apt-get install freeglut3 freeglut3-dev
 
@@ -30,10 +30,11 @@ sudo make install
 
 #delete previous enviroment flags
 
-#go to torcs/src/libs/raceengine/raceengine.ccp
-#and comment lines 619~625 to avoid countdown
+#go to torcs/src/libs/raceengineclient/raceengine.ccp
+#and comment lines 619~625 (or 675~683) to avoid countdown
 
 # add patch to restart races -> doc in here: https://github.com/Gastd/scr-meta-restart/tree/master
+
 # in torcs/src/drivers/scr_server/scr_server.cpp before '#ifdef __DISABLE_RESTART__' add:
 	car->ctrl.askRestart = true;
 	std::cerr << "Restarting the race" << endl;
@@ -62,6 +63,10 @@ sudo make install
 make 
 sudo make install
 sudo make datainstall
+
+# if something fails during compilation and its related to a char, change the following:
+[original]   const char* error = '\0';
+[solution]   const char* error = nullptr;
 
 #setup f1 car for practice for server 1
 cd /usr/local/share/games/torcs/drivers/scr_server/1
