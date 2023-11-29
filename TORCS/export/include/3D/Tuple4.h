@@ -1,1 +1,0 @@
-/home/miguel/Documentos/autonomous-racing-in-torcs/TORCS/src/modules/simu/simuv2/SOLID-2.0/include/3D/Tuple4.h
