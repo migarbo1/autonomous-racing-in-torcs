@@ -40,6 +40,7 @@ class TorcsEnv:
         self.client = snakeoil.Client(p=3001) if create_client else None
         self.time_step = 0
         self.max_speed = 330.
+        self.previous_state = None
 
 
     def step(self, actions: dict):
@@ -58,13 +59,13 @@ class TorcsEnv:
 
         # Apply the Agent's action into torcs
         self.client.respond_to_server()
-
+        
         # Get the response of TORCS
         self.client.get_servers_input()
         self.observation = self.parse_torcs_input(self.client.S.d)
         
         #TODO:
-        reward = 0
+        reward = self.compute_reward(self.client.S.d)
 
         # episode termination conditions: out of track or running backwards ¿small progress?
         if min(getattr(self.observation, 'track')) < 0 or \
@@ -97,6 +98,13 @@ class TorcsEnv:
         print('reset:', self.observation)
 
         return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
+
+
+    def compute_reward(self, state):
+        prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
+        reward = abs(state['speedX'] - prev_speed) + state['speedX']/self.max_speed
+        self.previous_state = state
+        return reward
 
 
     def compute_gear(self, speed):
@@ -143,6 +151,7 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
+        #TODO: if min(focus) == -1 get info from track
         keys = ['angle', 'focus', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
         observation = collections.namedtuple('observation', keys)
         return observation(
