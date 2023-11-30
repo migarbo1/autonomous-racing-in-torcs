@@ -10,30 +10,30 @@ import os
 
 PI = snakeoil.PI
 
-def restart_torcs():
+def restart_torcs(mode):
+    print(os.getcwd())
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
     os.system('torcs -nofuel -nodamage &')
     time.sleep(0.5)
-    os.system('sh ~/Documentos/autonomous-racing-in-torcs/torcs_python_client/autostart_race.sh')
+    os.system(f'sh {os.getcwd()}torcs_python_client/autostart_{mode}.sh')
     time.sleep(0.5)
 
 
 class TorcsEnv:
 
     def __init__(self, create_client = False) -> None:
-
-        restart_torcs()
+        restart_torcs(random.sample(['race', 'practice']))
 
         # Action order:[Accel, Brake, Steering]  
         action_lows = np.array([0.0, 0.0, -1.0])
         action_highs = np.array([1.0, 1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-        # Observation order:[Angle, focus(5), speedX, speedY, speedZ, track(19), trackPos]  
-        observation_lows = np.array([-PI, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
-        observation_highs = np.array([PI, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
+        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
+        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
+        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
 
@@ -88,8 +88,8 @@ class TorcsEnv:
             self.client.respond_to_server()
 
             # TO avoid memory leak re-launch torcs from time to time
-            if random.random() < 0.25:
-               restart_torcs()
+            if random.random() < 0.33:
+               restart_torcs(random.sample(['race', 'practice']))
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
@@ -127,7 +127,6 @@ class TorcsEnv:
     def observation2array(self, observation):
         res = []
         res.append(getattr(observation,'angle'))
-        res = res + list(getattr(observation, 'focus'))
         res.append(getattr(observation, 'speedX'))
         res.append(getattr(observation, 'speedY'))
         res.append(getattr(observation, 'speedZ'))
@@ -151,12 +150,10 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
-        #TODO: if min(focus) == -1 get info from track
-        keys = ['angle', 'focus', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
+        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
         observation = collections.namedtuple('observation', keys)
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
-            focus=np.array(obs_dict['focus'], dtype=np.float32)/200.,
             speedX=np.array(obs_dict['speedX'], dtype=np.float32)/self.max_speed,
             speedY=np.array(obs_dict['speedY'], dtype=np.float32)/self.max_speed,
             speedZ=np.array(obs_dict['speedZ'], dtype=np.float32)/self.max_speed,
