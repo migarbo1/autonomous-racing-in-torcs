@@ -4,10 +4,11 @@ from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
 import torch
+import os
 
 
 class PPO:
-    def __init__(self, env) -> None:
+    def __init__(self, env, test = False) -> None:
         # Set hyperparameters
         self._init_hyperparameters()
         
@@ -19,6 +20,12 @@ class PPO:
         # Initialize actor and critic networks
         self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
         self.critic = FeedForwardNN(self.obs_dim, 1)
+        if os.path.isfile('./ppo_actor.pth'):
+            print('loading actor weights ....')
+            self.actor.load_state_dict(torch.load('./ppo_actor.pth'))
+        if os.path.isfile('./ppo_critic.pth'):
+            print('loading critic weights ....')
+            self.critic.load_state_dict(torch.load('./ppo_critic.pth'))
 
         # create the covariance matrix for continuous action space
         self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
@@ -28,6 +35,8 @@ class PPO:
         self.actor_opt = Adam(self.actor.parameters(), lr=self.lr)
         self.critic_opt = Adam(self.critic.parameters(), lr=self.lr)
 
+        self.test = test
+
 
     def _init_hyperparameters(self):
         self.timesteps_per_batch = 4800
@@ -36,8 +45,14 @@ class PPO:
         self.n_updates_per_iteration = 5
         self.clip = 0.2
         self.lr = 0.005
-        self.num_minibatches = 12
+        self.save_ratio = 3
+
+        # advanced hyper parameters 
+        self.num_minibatches = 6
         self.ent_coef = 0
+        self.max_grad_norm = 0.5
+        self.target_kl = 0.02 
+        self.lamda = 0.98
 
 
     def get_action(self, state):
@@ -48,6 +63,9 @@ class PPO:
         # Sample an action from the distribution and get its log prob
         action = distribution.sample()
         log_prob = distribution.log_prob(action)
+
+        if self.test:
+            return action.detach().numpy(), 1
 
         #detach because they are tensors
         return action.detach().numpy(), log_prob.detach()
@@ -73,25 +91,36 @@ class PPO:
         act_batch = []              # shape(self.timesteps_per_batch, self.act_dim)
         logprob_batch = []          # shape(self.timesteps_per_batch,)
         rewards_batch = []          # shape(num_episodes, self.max_timesteps_per_episode)
-        future_rewards_batch = []   # shape(self.timesteps_per_batch,)
         ep_lengths_batch = []       # shape(num_episodes,)
 
+        val_batch = []
+        dones_batch = []
         cur_timesteps_in_batch = 0
+
         while cur_timesteps_in_batch < self.timesteps_per_batch:
             ep_rewards = []
+            ep_vals = []
+            ep_dones = []
 
             #TODO: see if our env returns 1 or 2 args in reset
             state, _ = self.env.reset()
             done = False
 
-            for step in range(self.max_timesteps_per_episode):
+            for _ in range(self.max_timesteps_per_episode):
+
+                ep_dones.append(done)
+
                 cur_timesteps_in_batch += 1
 
                 obs_batch.append(state)
                 action, log_prob = self.get_action(state)
+                
+                val = self.critic(state)
+
                 #TODO: see if ours needs also 5 args
                 state, reward, done, _ ,_ = self.env.step(action)
 
+                ep_vals.append(val.flatten())
                 act_batch.append(action)
                 ep_rewards.append(reward)
                 logprob_batch.append(log_prob)
@@ -101,14 +130,14 @@ class PPO:
 
             ep_lengths_batch.append(cur_timesteps_in_batch + 1)
             rewards_batch.append(ep_rewards)
+            val_batch.append(ep_vals)
+            dones_batch.append(ep_dones)
 
         obs_batch = torch.tensor(obs_batch, dtype=torch.float)
         act_batch = torch.tensor(act_batch, dtype=torch.float)
-        logprob_batch = torch.tensor(logprob_batch, dtype=torch.float)
+        logprob_batch = torch.tensor(logprob_batch, dtype=torch.float).flatten()
 
-        future_rewards_batch = self.compute_future_rewards(rewards_batch)
-
-        return obs_batch, act_batch, logprob_batch, future_rewards_batch, ep_lengths_batch
+        return obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch
 
 
     def evaluate(self, obs_batch, act_batch):
@@ -132,15 +161,46 @@ class PPO:
         self.critic_opt.param_groups[0]["lr"] = new_lr
 
 
-    def learn(self, max_steps):
-        current_timesteps = 0
-        while current_timesteps < max_steps:
-            obs_batch, act_batch, logprob_batch, future_rewards_batch, ep_lengths_batch = self.rollout()
+    def compute_gae(self, rewards_in_batch, values_in_batch, dones_in_batch):
+        advantage_batch = []
 
-            V, _, _ = self.evaluate(obs_batch, act_batch)
-            advantage_k = future_rewards_batch - V.detach()
+        for ep_r, ep_v, ep_d in zip(rewards_in_batch, values_in_batch, dones_in_batch):
+            ep_advantages = []
+            _advantage = 0
+
+            for i in reversed(range(len(ep_r))):
+                if i+1 < len(ep_r):
+                    # TD error
+                    delta = ep_r[i] + self.gamma * ep_v[i+1] * (1-ep_d[i+1]) - ep_v[i]
+                else:
+                    # last step
+                    delta = ep_r[i] - ep_v[i]
+
+                advantage = delta + self.gamma * self.lamda * (1-ep_d[i])* _advantage
+                _advantage = advantage
+                ep_advantages.insert(0, advantage)
+
+            advantage_batch.extend(ep_advantages)
+        
+        return torch.tensor(advantage_batch, dtype=torch.float)
+
+
+    def learn(self, max_timesteps):
+        current_timesteps = 0
+        current_iterations = 0
+        while current_timesteps < max_timesteps:
+            obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
+
+            # Compute Advantage using GAE
+            advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)
+            V = self.critic(obs_batch).squeeze()
+            future_rewards_batch = advantage_k + V.detach()
+
             # Normatize advantage to make PPO stable
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
+            
+            current_timesteps += np.sum(ep_lengths_batch)
+            current_iterations += 1
 
             step = obs_batch.size(0)
             indexes = np.arange(step)
@@ -148,12 +208,14 @@ class PPO:
 
             for _ in range(self.n_updates_per_iteration):
 
-                self.lr_annealing(current_timesteps, max_steps)
+                self.lr_annealing(current_timesteps, max_timesteps)
 
                 np.random.shuffle(indexes)
                 for start in range(0, step, minibatch_size):
                     end = start + minibatch_size
                     idx = indexes[start:end]
+
+                    # Get data from indexes
                     mini_obs = obs_batch[idx]
                     mini_acts = act_batch[idx]
                     mini_logprobs = logprob_batch[idx]
@@ -164,8 +226,10 @@ class PPO:
                     V, cur_logprob, entropy = self.evaluate(mini_obs, mini_acts)
 
                     # compute ratios
-                    ratios = torch.exp(cur_logprob - mini_logprobs)
+                    log_ratios = cur_logprob - mini_logprobs
+                    ratios = torch.exp(log_ratios)
 
+                    approx_kl = ((ratios - 1) - log_ratios).mean()
 
                     # Compute surrogate losses
                     surr_1 = ratios * mini_ak
@@ -179,16 +243,24 @@ class PPO:
                     actor_loss = actor_loss - self.ent_coef * entropy_loss
                     
                     critic_loss = MSELoss()(V, mini_future_rewards)
+                
+                    # Propagate loss through actor network
+                    self.actor_opt.zero_grad()
+                    actor_loss.backward(retain_graph=True) #flag needed -> avoids buffer already free error
+                    torch.nn.utils.clip_grad_norm(self.actor.parameters(), self.max_grad_norm)
+                    self.actor_opt.step()
 
+                    #compute gradients and propagate loss though critic
+                    self.critic_opt.zero_grad()
+                    critic_loss.backward()
+                    torch.nn.utils.clip_grad_norm(self.critic.parameters(), self.max_grad_norm)
+                    
+                    self.critic_opt.step()
 
-                # Propagate loss through actor network
-                self.actor_opt.zero_grad()
-                actor_loss.backward(retain_graph=True) #flag needed -> avoids buffer already free error
-                self.actor_opt.step()
-
-                #compute gradients and propagate loss though critic
-                self.critic_opt.zero_grad()
-                critic_loss.backward()
-                self.critic_opt.step()
-
-            current_timesteps += np.sum(ep_lengths_batch)
+                if approx_kl > self.target_kl:
+                    break
+            print('current iterations:', current_iterations)
+            if current_iterations % self.save_ratio == 0:
+                print('Models saved')
+                torch.save(self.actor.state_dict(), './ppo_actor.pth')
+                torch.save(self.critic.state_dict(), './ppo_critic.pth')
