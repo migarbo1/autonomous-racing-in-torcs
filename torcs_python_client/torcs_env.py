@@ -17,14 +17,14 @@ def restart_torcs(mode):
     time.sleep(0.5)
     os.system('torcs -nofuel -nodamage &')
     time.sleep(0.5)
-    os.system(f'sh {os.getcwd()}torcs_python_client/autostart_{mode}.sh')
+    os.system(f'sh {os.getcwd()}/torcs_python_client/autostart_{mode}.sh')
     time.sleep(0.5)
 
 
 class TorcsEnv:
 
     def __init__(self, create_client = False) -> None:
-        restart_torcs(random.sample(['race', 'practice']))
+        restart_torcs(random.sample(['race', 'practice'], 1)[0])
 
         # Action order:[Accel, Brake, Steering]  
         action_lows = np.array([0.0, 0.0, -1.0])
@@ -89,7 +89,7 @@ class TorcsEnv:
 
             # TO avoid memory leak re-launch torcs from time to time
             if random.random() < 0.33:
-               restart_torcs(random.sample(['race', 'practice']))
+               restart_torcs(random.sample(['race', 'practice'], 1)[0])
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
