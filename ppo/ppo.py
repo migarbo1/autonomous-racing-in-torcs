@@ -133,9 +133,9 @@ class PPO:
             val_batch.append(ep_vals)
             dones_batch.append(ep_dones)
 
-        obs_batch = torch.tensor(obs_batch, dtype=torch.float)
-        act_batch = torch.tensor(act_batch, dtype=torch.float)
-        logprob_batch = torch.tensor(logprob_batch, dtype=torch.float).flatten()
+        obs_batch = torch.tensor(np.array(obs_batch), dtype=torch.float)
+        act_batch = torch.tensor(np.array(act_batch), dtype=torch.float)
+        logprob_batch = torch.tensor(np.array(logprob_batch), dtype=torch.float).flatten()
 
         return obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch
 
@@ -247,13 +247,13 @@ class PPO:
                     # Propagate loss through actor network
                     self.actor_opt.zero_grad()
                     actor_loss.backward(retain_graph=True) #flag needed -> avoids buffer already free error
-                    torch.nn.utils.clip_grad_norm(self.actor.parameters(), self.max_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
                     self.actor_opt.step()
 
                     #compute gradients and propagate loss though critic
                     self.critic_opt.zero_grad()
                     critic_loss.backward()
-                    torch.nn.utils.clip_grad_norm(self.critic.parameters(), self.max_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(self.critic.parameters(), self.max_grad_norm)
                     
                     self.critic_opt.step()
 
