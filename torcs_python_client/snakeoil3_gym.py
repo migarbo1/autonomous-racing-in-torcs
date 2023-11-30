@@ -257,8 +257,6 @@ class Client():
                 self.S.parse_server_str(sockdata)
                 if self.debug:
                     sys.stderr.write("\x1b[2J\x1b[H") # Clear for steady output.
-                    print(self.S)
-                print('get_server_imput after parse_server', self.S.d)
                 break # Can now return from this function.
         return self.S.d
 

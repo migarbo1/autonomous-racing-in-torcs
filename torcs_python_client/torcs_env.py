@@ -70,7 +70,7 @@ class TorcsEnv:
         # episode termination conditions: out of track or running backwards ¿small progress?
         if min(getattr(self.observation, 'track')) < 0 or \
             np.cos(getattr(self.observation, 'angle')) < 0:
-            reward = -1
+            reward = -100
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
@@ -95,7 +95,6 @@ class TorcsEnv:
         self.client.MAX_STEPS = np.inf
 
         self.observation = self.client.get_servers_input()
-        print('reset:', self.observation)
 
         return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
 
@@ -132,7 +131,6 @@ class TorcsEnv:
         res.append(getattr(observation, 'speedZ'))
         res = res + list(getattr(observation, 'track'))
         res.append(getattr(observation, 'trackPos'))
-        print(res)
         return np.array(res)
 
 
