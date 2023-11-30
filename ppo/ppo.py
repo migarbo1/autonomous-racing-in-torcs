@@ -36,6 +36,8 @@ class PPO:
         self.n_updates_per_iteration = 5
         self.clip = 0.2
         self.lr = 0.005
+        self.num_minibatches = 12
+        self.ent_coef = 0
 
 
     def get_action(self, state):
@@ -119,7 +121,7 @@ class PPO:
         logprobs = distribution.log_prob(act_batch)
 
         # Squeeze because we have shape(timesteps_per_batch, 1) and we hant only a 1d array 
-        return V.squeeze(), logprobs
+        return V.squeeze(), logprobs, distribution.entropy()
 
 
     def lr_annealing(self, cur_timesteps, max_timesteps):
@@ -135,29 +137,49 @@ class PPO:
         while current_timesteps < max_steps:
             obs_batch, act_batch, logprob_batch, future_rewards_batch, ep_lengths_batch = self.rollout()
 
-            V, _ = self.evaluate(obs_batch, act_batch)
+            V, _, _ = self.evaluate(obs_batch, act_batch)
             advantage_k = future_rewards_batch - V.detach()
             # Normatize advantage to make PPO stable
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
+
+            step = obs_batch.size(0)
+            indexes = np.arange(step)
+            minibatch_size = step // self.num_minibatches
 
             for _ in range(self.n_updates_per_iteration):
 
                 self.lr_annealing(current_timesteps, max_steps)
 
-                # Compute pi_theta(a_t, s_t)
-                V, cur_logprob = self.evaluate(obs_batch, act_batch)
+                np.random.shuffle(indexes)
+                for start in range(0, step, minibatch_size):
+                    end = start + minibatch_size
+                    idx = indexes[start:end]
+                    mini_obs = obs_batch[idx]
+                    mini_acts = act_batch[idx]
+                    mini_logprobs = logprob_batch[idx]
+                    mini_ak = advantage_k[idx]
+                    mini_future_rewards = future_rewards_batch[idx]
 
-                # compute ratios
-                ratios = torch.exp(cur_logprob - logprob_batch)
+                    # Compute pi_theta(a_t, s_t)
+                    V, cur_logprob, entropy = self.evaluate(mini_obs, mini_acts)
 
-                # Compute surrogate losses
-                surr_1 = ratios * advantage_k
-                # Clamp == clip
-                surr_2 = torch.clamp(ratios, 1-self.clip, 1+self.clip) * advantage_k
+                    # compute ratios
+                    ratios = torch.exp(cur_logprob - mini_logprobs)
 
-                # compute losses for both networks
-                actor_loss = (-torch.min(surr_1, surr_2)).mean()
-                critic_loss = MSELoss()(V, future_rewards_batch)
+
+                    # Compute surrogate losses
+                    surr_1 = ratios * mini_ak
+                    # Clamp == clip
+                    surr_2 = torch.clamp(ratios, 1-self.clip, 1+self.clip) * mini_ak
+
+                    # compute losses for both networks
+                    actor_loss = (-torch.min(surr_1, surr_2)).mean()
+                    # entropy regularization for actor network
+                    entropy_loss = entropy.mean()
+                    actor_loss = actor_loss - self.ent_coef * entropy_loss
+                    
+                    critic_loss = MSELoss()(V, mini_future_rewards)
+
 
                 # Propagate loss through actor network
                 self.actor_opt.zero_grad()
