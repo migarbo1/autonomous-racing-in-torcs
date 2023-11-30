@@ -122,6 +122,14 @@ class PPO:
         return V.squeeze(), logprobs
 
 
+    def lr_annealing(self, cur_timesteps, max_timesteps):
+        frac = (cur_timesteps - 1.0) / max_timesteps
+        new_lr = self.lr * (1.0 - frac)
+        new_lr = max(new_lr, 0.0)
+        self.actor_opt.param_groups[0]["lr"] = new_lr
+        self.critic_opt.param_groups[0]["lr"] = new_lr
+
+
     def learn(self, max_steps):
         current_timesteps = 0
         while current_timesteps < max_steps:
@@ -133,6 +141,9 @@ class PPO:
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
 
             for _ in range(self.n_updates_per_iteration):
+
+                self.lr_annealing(current_timesteps, max_steps)
+
                 # Compute pi_theta(a_t, s_t)
                 V, cur_logprob = self.evaluate(obs_batch, act_batch)
 
