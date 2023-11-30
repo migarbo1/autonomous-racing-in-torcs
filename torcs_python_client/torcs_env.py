@@ -6,12 +6,12 @@ import collections
 import logging
 import random
 import time
+import math
 import os
 
 PI = snakeoil.PI
 
 def restart_torcs(mode):
-    print(os.getcwd())
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
@@ -26,7 +26,7 @@ class TorcsEnv:
     def __init__(self, create_client = False) -> None:
         restart_torcs(random.sample(['race', 'practice'], 1)[0])
 
-        # Action order:[Accel, Brake, Steering]  
+        # Action order:[Accel, Brake, steer]  
         action_lows = np.array([0.0, 0.0, -1.0])
         action_highs = np.array([1.0, 1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
@@ -44,11 +44,13 @@ class TorcsEnv:
 
 
     def step(self, actions: dict):
-        # to think: how to smoothen steering movements -> if now it is -1 and action tells 0... ¿place in value function?  
+        # to think: how to smoothen steer movements -> if now it is -1 and action tells 0... ¿place in value function?  
         done = False
 
         if isinstance(actions, np.ndarray):
             actions = self.action_array2dict(actions)
+
+        print('Parsed actions:', actions)
 
         # set action dict to the selected actions by network
         for k, v in actions.items():
@@ -67,15 +69,25 @@ class TorcsEnv:
         #TODO:
         reward = self.compute_reward(self.client.S.d)
 
+        print("angle with road:", getattr(self.observation, 'angle'))
+        print("Sin of angle:", np.sin(getattr(self.observation, 'angle')))
+
         # episode termination conditions: out of track or running backwards ¿small progress?
         if min(getattr(self.observation, 'track')) < 0 or \
             np.cos(getattr(self.observation, 'angle')) < 0:
+            print('<<<<<<<<<<<<<Termination condition>>>>>>>>>>>>>>><<<')
+            print("out of track sensor:", min(getattr(self.observation, 'track')))
+            print("full tracks sensor", getattr(self.observation, 'track'))
+            print("running backwards sensor:", np.cos(getattr(self.observation, 'angle')))
+            print("angle with road:", getattr(self.observation, 'angle'))
+            print("Sin of angle:", np.sin(getattr(self.observation, 'angle')))
             reward = -100
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
         
         self.time_step += 1
+        print("full tracks sensor", getattr(self.observation, 'track'))
 
         return self.observation2array(self.observation), reward, done, None, None # last Nones to compy with gym syntax
 
@@ -95,13 +107,24 @@ class TorcsEnv:
         self.client.MAX_STEPS = np.inf
 
         self.observation = self.client.get_servers_input()
+        print('Actual angle with road:', self.observation['angle'])
+        print('Actual track distances:', self.observation['track'])
 
         return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
 
 
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        reward = abs(state['speedX'] - prev_speed) + state['speedX']/self.max_speed
+        speed_reward = abs(state['speedX'] - prev_speed) + state['speedX']/self.max_speed
+
+        steer_reward = np.sin(state['angle'])
+        
+        reward = speed_reward - steer_reward
+
+        print('SPEED REWARD: ', speed_reward)
+        print('STEER REWARD: ', steer_reward)
+        print('TOTAL REWARD: ', reward)
+
         self.previous_state = state
         return reward
 
@@ -138,7 +161,7 @@ class TorcsEnv:
         res = {
             'accel': actions[0],
             'brake': actions[1],
-            'steering': actions[2]
+            'steer': actions[2]
             }
         return res
 
