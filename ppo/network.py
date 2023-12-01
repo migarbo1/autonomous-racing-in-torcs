@@ -14,7 +14,10 @@ class FeedForwardNN(nn.Module):
 
 
     def forward(self, observation: np.ndarray):
-        observation_tensor = torch.tensor(observation, dtype=torch.float)
+        if isinstance(observation, np.ndarray):
+            observation_tensor = torch.tensor(observation, dtype=torch.float)
+        else:
+            observation_tensor = observation
 
         act1 = F.relu(self.input_layer(observation_tensor))
         act2 = F.relu(self.hidden_layer(act1))

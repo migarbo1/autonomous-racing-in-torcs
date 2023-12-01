@@ -28,7 +28,7 @@ class PPO:
             self.critic.load_state_dict(torch.load('./ppo_critic.pth'))
 
         # create the covariance matrix for continuous action space
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.25)
         self.cov_mat = torch.diag(self.cov_var)
 
         # Define the optimizers
@@ -39,8 +39,8 @@ class PPO:
 
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 4800
-        self.max_timesteps_per_episode = 1600
+        self.timesteps_per_batch = 9600
+        self.max_timesteps_per_episode = 3200
         self.gamma = 0.95
         self.n_updates_per_iteration = 5
         self.clip = 0.2

@@ -15,7 +15,7 @@ def get_action_object():
     return {
         'accel': random.uniform(0.7, 1),
         'brake': random.uniform(0, 0.2),
-        'steering': random.uniform(-1, 1)
+        'steer': random.uniform(-1, 1)
     }
 
 print("TORCS Experiment Start.")
