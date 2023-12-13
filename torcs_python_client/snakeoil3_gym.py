@@ -58,6 +58,8 @@ import sys
 import getopt
 import os
 import time
+import random
+import logging
 PI= 3.14159265359
 
 data_size = 1024
@@ -77,6 +79,21 @@ ophelp+= ' --version, -v        Show current version.'
 usage= 'Usage: %s [ophelp [optargs]] \n' % sys.argv[0]
 usage= usage + ophelp
 version= "20130505-2"
+
+TEXTMODE = True
+
+def restart_torcs(sample = False):
+    mode = random.sample(['race', 'practice'], 1)[0] if sample else 'race'
+    logging.log(0, 'Killing torcs and re-launching...')
+    os.system(f'pkill torcs')
+    time.sleep(0.5)
+    if TEXTMODE:
+        os.system('torcs -nofuel -nodamage -r /usr/local/share/games/torcs/config/raceman/quickrace.xml &') # -noisy 
+    else:
+        os.system('torcs -nofuel -nodamage &') # -noisy 
+        time.sleep(0.5)
+        os.system(f'sh {os.getcwd()}/torcs_python_client/autostart_{mode}.sh')
+        time.sleep(0.5)
 
 def clip(v,lo,hi):
     if v<lo: return lo
@@ -165,12 +182,7 @@ class Client():
                 print("Count Down : " + str(n_fail))
                 if n_fail < 0:
                     print("relaunch torcs")
-                    os.system('pkill torcs')
-                    time.sleep(1.0)
-                    os.system('torcs -nofuel -nodamage &')
-
-                    time.sleep(1.0)
-                    os.system('sh autostart.sh')
+                    restart_torcs(textmode=True)
                     n_fail = 5
                 n_fail -= 1
 
@@ -268,8 +280,6 @@ class Client():
         except socket.error as emsg:
             print("Error sending to server: %s Message %s" % (emsg[1],str(emsg[0])))
             sys.exit(-1)
-        # Or use this for plain output:
-        #if self.debug: print self.R
 
     def shutdown(self):
         if not self.so: return
@@ -332,7 +342,7 @@ class DriverAction():
         self.d['brake']= clip(self.d['brake'], 0, 1)
         self.d['accel']= clip(self.d['accel'], 0, 1)
         self.d['clutch']= clip(self.d['clutch'], 0, 1)
-        if self.d['gear'] not in [-1, 0, 1, 2, 3, 4, 5, 6]:
+        if self.d['gear'] not in [-1, 0, 1, 2, 3, 4, 5, 6, 7]:
             self.d['gear']= 0
         if self.d['meta'] not in [0,1]:
             self.d['meta']= 0

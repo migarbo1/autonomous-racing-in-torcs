@@ -1,3 +1,4 @@
+import time
 from torch.distributions import MultivariateNormal
 from .network import FeedForwardNN
 from torch.optim import Adam
@@ -28,7 +29,7 @@ class PPO:
             self.critic.load_state_dict(torch.load('./ppo_critic.pth'))
 
         # create the covariance matrix for continuous action space
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.25)
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
         self.cov_mat = torch.diag(self.cov_var)
 
         # Define the optimizers
@@ -39,9 +40,9 @@ class PPO:
 
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 9600
-        self.max_timesteps_per_episode = 3200
-        self.gamma = 0.95
+        self.timesteps_per_batch = 4800 # 120
+        self.max_timesteps_per_episode = 1600 # 48
+        self.gamma = 0.99
         self.n_updates_per_iteration = 5
         self.clip = 0.2
         self.lr = 0.005
@@ -49,7 +50,7 @@ class PPO:
 
         # advanced hyper parameters 
         self.num_minibatches = 6
-        self.ent_coef = 0
+        self.ent_coef = 0.05
         self.max_grad_norm = 0.5
         self.target_kl = 0.02 
         self.lamda = 0.98
@@ -58,10 +59,14 @@ class PPO:
     def get_action(self, state):
         mean = self.actor(state)
 
-        distribution = MultivariateNormal(mean, self.cov_mat)
+        # print('Action means: ', mean)
+
+        distribution = MultivariateNormal(mean, self.cov_mat)   
 
         # Sample an action from the distribution and get its log prob
         action = distribution.sample()
+
+        print('Selected actions: ', action)
         log_prob = distribution.log_prob(action)
 
         if self.test:
@@ -102,10 +107,9 @@ class PPO:
             ep_vals = []
             ep_dones = []
 
-            #TODO: see if our env returns 1 or 2 args in reset
             state, _ = self.env.reset()
             done = False
-
+            
             for _ in range(self.max_timesteps_per_episode):
 
                 ep_dones.append(done)
@@ -262,5 +266,6 @@ class PPO:
             print('current iterations:', current_iterations)
             if current_iterations % self.save_ratio == 0:
                 print('Models saved')
+                self.env.save_laptimes()
                 torch.save(self.actor.state_dict(), './ppo_actor.pth')
                 torch.save(self.critic.state_dict(), './ppo_critic.pth')

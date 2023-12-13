@@ -6,34 +6,25 @@ import collections
 import logging
 import random
 import time
+import json
 import math
 import os
 
 PI = snakeoil.PI
 
-def restart_torcs(mode):
-    logging.log(0, 'Killing torcs and re-launching...')
-    os.system(f'pkill torcs')
-    time.sleep(0.5)
-    os.system('torcs -nofuel -nodamage &')
-    time.sleep(0.5)
-    os.system(f'sh {os.getcwd()}/torcs_python_client/autostart_{mode}.sh')
-    time.sleep(0.5)
-
-
 class TorcsEnv:
 
     def __init__(self, create_client = False) -> None:
-        restart_torcs(random.sample(['race', 'practice'], 1)[0])
+        snakeoil.restart_torcs()
 
         # Action order:[Accel, Brake, steer]  
         action_lows = np.array([0.0, 0.0, -1.0])
         action_highs = np.array([1.0, 1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
-        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
-        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
+        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, accelX, accelY, mov_prev_step]  
+        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62, 0], dtype='float')
+        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
 
@@ -41,6 +32,30 @@ class TorcsEnv:
         self.time_step = 0
         self.max_speed = 330.
         self.previous_state = None
+
+        self.has_moved = False
+        self.min_speed = 5/self.max_speed
+
+        self.best_lap_times = self.get_best_laptimes()
+
+
+    def check_if_best_lap(self, track, time):
+        prev_time = self.best_lap_times.get(track, np.inf)
+        if time != 0 and time < prev_time:
+            self.best_lap_times[track] = time
+
+
+    def get_best_laptimes(self):
+        if os.path.isfile(f'{os.getcwd()}/best_laptimes.json'):
+            with open(f'{os.getcwd()}/best_laptimes.json', 'r') as file:
+                return json.loads(file.read())
+        else:
+            return {}
+
+
+    def save_laptimes(self):
+        with open(f'{os.getcwd()}/best_laptimes.json', 'w') as file:
+            file.write(json.dumps(self.best_lap_times))
 
 
     def step(self, actions: dict):
@@ -50,7 +65,7 @@ class TorcsEnv:
         if isinstance(actions, np.ndarray):
             actions = self.action_array2dict(actions)
 
-        print('Parsed actions:', actions)
+        # print('Parsed actions:', actions)
 
         # set action dict to the selected actions by network
         for k, v in actions.items():
@@ -65,67 +80,75 @@ class TorcsEnv:
         # Get the response of TORCS
         self.client.get_servers_input()
         self.observation = self.parse_torcs_input(self.client.S.d)
-        
+
+        self.check_if_best_lap('E-Track 5', self.client.S.d['lastLapTime'])        
+
         #TODO:
         reward = self.compute_reward(self.client.S.d)
 
-        print("angle with road:", getattr(self.observation, 'angle'))
-        print("Sin of angle:", np.sin(getattr(self.observation, 'angle')))
-
         # episode termination conditions: out of track or running backwards ¿small progress?
         if min(getattr(self.observation, 'track')) < 0 or \
-            np.cos(getattr(self.observation, 'angle')) < 0:
-            print('<<<<<<<<<<<<<Termination condition>>>>>>>>>>>>>>><<<')
-            print("out of track sensor:", min(getattr(self.observation, 'track')))
-            print("full tracks sensor", getattr(self.observation, 'track'))
-            print("running backwards sensor:", np.cos(getattr(self.observation, 'angle')))
-            print("angle with road:", getattr(self.observation, 'angle'))
-            print("Sin of angle:", np.sin(getattr(self.observation, 'angle')))
-            reward = -100
+            np.cos(getattr(self.observation, 'angle')) < 0 or \
+            getattr(self.observation, 'speedX') < self.min_speed and self.has_moved:
+            reward = -1000
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
         
+        self.has_moved = self.has_moved or getattr(self.observation, 'speedX') > (self.min_speed*2)
+
         self.time_step += 1
-        print("full tracks sensor", getattr(self.observation, 'track'))
+
+        self.previous_state = self.client.S.d.copy() # store full state instead of "observation" so we can track all values
+
+        # print('RECEIVED OBSERVATION:', self.observation)
 
         return self.observation2array(self.observation), reward, done, None, None # last Nones to compy with gym syntax
 
     
     def reset(self):
         self.time_step = 0
+        self.has_moved = False
 
         if self.client:
             self.client.R.d['meta'] = 1
             self.client.respond_to_server()
 
             # TO avoid memory leak re-launch torcs from time to time
-            if random.random() < 0.33:
-               restart_torcs(random.sample(['race', 'practice'], 1)[0])
+            #if random.random() < 0.33:
+            snakeoil.restart_torcs()
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
 
         self.observation = self.client.get_servers_input()
-        print('Actual angle with road:', self.observation['angle'])
-        print('Actual track distances:', self.observation['track'])
 
         return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
 
 
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        speed_reward = abs(state['speedX'] - prev_speed) + state['speedX']/self.max_speed
+        speed_reward = abs(state['speedX'] - prev_speed)/self.max_speed + state['speedX']/self.max_speed
 
-        steer_reward = np.sin(state['angle'])
+        prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
+        angle_variation = abs(state['angle'] - prev_angle)
+        # steer_reward = -10 * (abs(np.sin(state['angle'])) + angle_variation)
         
-        reward = speed_reward - steer_reward
+        # reward = speed_reward - abs(np.sin(state['angle']))#+ steer_reward
 
-        print('SPEED REWARD: ', speed_reward)
-        print('STEER REWARD: ', steer_reward)
-        print('TOTAL REWARD: ', reward)
+        forward_view =(np.mean(state['track'][8:11])/200)
 
-        self.previous_state = state
+        vertical_speed = state['speedX'] * abs(np.cos(state['angle']))
+        horizontal_speed = state['speedX'] * abs(np.sin(state['angle']))
+
+        reward = (vertical_speed - horizontal_speed )#/self.max_speed # \
+            # - angle_variation \
+            # + forward_view
+
+        # print('SPEED REWARD: ', speed_reward)
+        # print('STEER REWARD: ', steer_reward)
+        print(f'v_sp: {vertical_speed/self.max_speed:4f}; h_sp: {horizontal_speed/self.max_speed:4f}; delta: {angle_variation:4f}; REWARD: {reward:4f}')
+
         return reward
 
 
@@ -154,6 +177,9 @@ class TorcsEnv:
         res.append(getattr(observation, 'speedZ'))
         res = res + list(getattr(observation, 'track'))
         res.append(getattr(observation, 'trackPos'))
+        res.append(getattr(observation, 'accelX'))
+        res.append(getattr(observation, 'accelY'))
+        res.append(getattr(observation, 'mov_prev_step'))
         return np.array(res)
 
 
@@ -171,13 +197,25 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
-        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
+        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos', 'accelX', 'accelY', 'mov_prev_step']
         observation = collections.namedtuple('observation', keys)
+
+        prev_speedx = self.previous_state['speedX'] if self.previous_state != None else 0
+        prev_time = self.previous_state['curLapTime'] if self.previous_state != None else 0
+        accelX = (obs_dict['speedX'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
+        accelY = (obs_dict['speedY'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
+
+        prev_dist_raced =  self.previous_state['distRaced'] if self.previous_state != None else 0
+        mov_prev_step = obs_dict['distRaced'] - prev_dist_raced
+
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
             speedX=np.array(obs_dict['speedX'], dtype=np.float32)/self.max_speed,
             speedY=np.array(obs_dict['speedY'], dtype=np.float32)/self.max_speed,
             speedZ=np.array(obs_dict['speedZ'], dtype=np.float32)/self.max_speed,
             track=np.array(obs_dict['track'], dtype=np.float32)/200.,
-            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32)
+            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32),
+            accelX=np.array(accelX, dtype=np.float32),
+            accelY=np.array(accelY, dtype=np.float32),
+            mov_prev_step=np.array(mov_prev_step, dtype=np.float32) # it's always zero
         )

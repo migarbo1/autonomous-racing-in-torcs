@@ -6,7 +6,8 @@ import os
 if __name__ == '__main__':
     env = TorcsEnv()
     model = PPO(env)
-    model.learn(400000)
+    model.learn(500000)
+    env.save_laptimes()
     torch.save(model.actor.state_dict(), './ppo_actor.pth')
     torch.save(model.critic.state_dict(), './ppo_critic.pth')
     os.system(f'pkill torcs')
