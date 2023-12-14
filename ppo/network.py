@@ -32,4 +32,14 @@ class FeedForwardNN(nn.Module):
         # act3 = self.do3(act3)
         out = self.output_layer(act3)
 
+        # for actions apply activation function
+        if out.size(dim=0) == 3:
+            sigm_out = out[0:2]
+            tanh_out = out[2:]
+            tuple_of_activated_parts = (
+                F.sigmoid(sigm_out),
+                F.tanh(tanh_out)
+            )
+            out = torch.cat(tuple_of_activated_parts, dim=0)
+
         return out

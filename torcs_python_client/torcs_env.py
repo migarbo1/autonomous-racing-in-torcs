@@ -22,9 +22,9 @@ class TorcsEnv:
         action_highs = np.array([1.0, 1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, accelX, accelY, mov_prev_step]  
-        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62, 0], dtype='float')
-        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62, 2**62], dtype='float')
+        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, accelX, accelY]  
+        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62], dtype='float')
+        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
 
@@ -34,7 +34,7 @@ class TorcsEnv:
         self.previous_state = None
 
         self.has_moved = False
-        self.min_speed = 5/self.max_speed
+        self.min_speed = 3/self.max_speed
 
         self.best_lap_times = self.get_best_laptimes()
 
@@ -58,7 +58,7 @@ class TorcsEnv:
             file.write(json.dumps(self.best_lap_times))
 
 
-    def step(self, actions: dict):
+    def step(self, actions: list):
         # to think: how to smoothen steer movements -> if now it is -1 and action tells 0... ¿place in value function?  
         done = False
 
@@ -128,7 +128,7 @@ class TorcsEnv:
 
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        speed_reward = abs(state['speedX'] - prev_speed)/self.max_speed + state['speedX']/self.max_speed
+        speed_reward = (abs(state['speedX'] - prev_speed)+ state['speedX'])/self.max_speed
 
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
         angle_variation = abs(state['angle'] - prev_angle)
@@ -141,8 +141,8 @@ class TorcsEnv:
         vertical_speed = state['speedX'] * abs(np.cos(state['angle']))
         horizontal_speed = state['speedX'] * abs(np.sin(state['angle']))
 
-        reward = (vertical_speed - horizontal_speed )#/self.max_speed # \
-            # - angle_variation \
+        reward = speed_reward + (vertical_speed - horizontal_speed )/self.max_speed# \
+            #- angle_variation \
             # + forward_view
 
         # print('SPEED REWARD: ', speed_reward)
@@ -179,7 +179,6 @@ class TorcsEnv:
         res.append(getattr(observation, 'trackPos'))
         res.append(getattr(observation, 'accelX'))
         res.append(getattr(observation, 'accelY'))
-        res.append(getattr(observation, 'mov_prev_step'))
         return np.array(res)
 
 
@@ -187,7 +186,7 @@ class TorcsEnv:
         res = {
             'accel': actions[0],
             'brake': actions[1],
-            'steer': actions[2]
+            # 'steer': actions[2]
             }
         return res
 
@@ -197,16 +196,13 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
-        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos', 'accelX', 'accelY', 'mov_prev_step']
+        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos', 'accelX', 'accelY']
         observation = collections.namedtuple('observation', keys)
 
         prev_speedx = self.previous_state['speedX'] if self.previous_state != None else 0
         prev_time = self.previous_state['curLapTime'] if self.previous_state != None else 0
         accelX = (obs_dict['speedX'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
         accelY = (obs_dict['speedY'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
-
-        prev_dist_raced =  self.previous_state['distRaced'] if self.previous_state != None else 0
-        mov_prev_step = obs_dict['distRaced'] - prev_dist_raced
 
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
@@ -216,6 +212,5 @@ class TorcsEnv:
             track=np.array(obs_dict['track'], dtype=np.float32)/200.,
             trackPos=np.array(obs_dict['trackPos'], dtype=np.float32),
             accelX=np.array(accelX, dtype=np.float32),
-            accelY=np.array(accelY, dtype=np.float32),
-            mov_prev_step=np.array(mov_prev_step, dtype=np.float32) # it's always zero
+            accelY=np.array(accelY, dtype=np.float32)
         )
