@@ -1,4 +1,5 @@
 #imports
+import pickle
 from . import snakeoil3_gym as snakeoil
 from gymnasium import spaces
 import numpy as np
@@ -18,15 +19,14 @@ class TorcsEnv:
         snakeoil.restart_torcs()
 
         # Action order:[Accel, Brake, steer]  
-        action_lows = np.array([0.0, 0.0, -1.0])
-        action_highs = np.array([1.0, 1.0, 1.0])
+        action_lows = np.array([-1.0, -1.0])
+        action_highs = np.array([1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
         # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, accelX, accelY]  
         observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62], dtype='float')
         observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
-
 
         self.client = snakeoil.Client(p=3001) if create_client else None
         self.time_step = 0
@@ -36,26 +36,20 @@ class TorcsEnv:
         self.has_moved = False
         self.min_speed = 3/self.max_speed
 
-        self.best_lap_times = self.get_best_laptimes()
+        self.training_data = self.load_training_data()
 
 
-    def check_if_best_lap(self, track, time):
-        prev_time = self.best_lap_times.get(track, np.inf)
-        if time != 0 and time < prev_time:
-            self.best_lap_times[track] = time
-
-
-    def get_best_laptimes(self):
-        if os.path.isfile(f'{os.getcwd()}/best_laptimes.json'):
-            with open(f'{os.getcwd()}/best_laptimes.json', 'r') as file:
-                return json.loads(file.read())
+    def load_training_data(self):
+        if os.path.isfile(f'{os.getcwd()}/training_data.pickle'):
+            with open(f'{os.getcwd()}/training_data.pickle', 'rb') as file:
+                return pickle.load(file)
         else:
-            return {}
+            return {"total_training_timesteps": 0.0, "actor_episodic_avg_loss": [], "critic_episodic_avg_loss": [], "eval_results": []}
 
 
-    def save_laptimes(self):
-        with open(f'{os.getcwd()}/best_laptimes.json', 'w') as file:
-            file.write(json.dumps(self.best_lap_times))
+    def save_training_data(self):
+        with open(f'{os.getcwd()}/training_data.pickle', 'wb') as file:
+            pickle.dump(self.training_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
     def step(self, actions: list):
@@ -79,9 +73,7 @@ class TorcsEnv:
         
         # Get the response of TORCS
         self.client.get_servers_input()
-        self.observation = self.parse_torcs_input(self.client.S.d)
-
-        self.check_if_best_lap('E-Track 5', self.client.S.d['lastLapTime'])        
+        self.observation = self.parse_torcs_input(self.client.S.d)    
 
         #TODO:
         reward = self.compute_reward(self.client.S.d)
@@ -106,7 +98,7 @@ class TorcsEnv:
         return self.observation2array(self.observation), reward, done, None, None # last Nones to compy with gym syntax
 
     
-    def reset(self):
+    def reset(self, eval = False):
         self.time_step = 0
         self.has_moved = False
 
@@ -116,7 +108,7 @@ class TorcsEnv:
 
             # TO avoid memory leak re-launch torcs from time to time
             #if random.random() < 0.33:
-            snakeoil.restart_torcs()
+            snakeoil.restart_torcs(eval)
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
@@ -128,7 +120,7 @@ class TorcsEnv:
 
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        speed_reward = (abs(state['speedX'] - prev_speed)+ state['speedX'])/self.max_speed
+        speed_reward = abs(state['speedX'] - prev_speed)
 
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
         angle_variation = abs(state['angle'] - prev_angle)
@@ -141,8 +133,8 @@ class TorcsEnv:
         vertical_speed = state['speedX'] * abs(np.cos(state['angle']))
         horizontal_speed = state['speedX'] * abs(np.sin(state['angle']))
 
-        reward = speed_reward + (vertical_speed - horizontal_speed )/self.max_speed# \
-            #- angle_variation \
+        reward = speed_reward + (vertical_speed + horizontal_speed )/self.max_speed \
+            - angle_variation
             # + forward_view
 
         # print('SPEED REWARD: ', speed_reward)
@@ -183,11 +175,19 @@ class TorcsEnv:
 
 
     def action_array2dict(self, actions):
+        accel, brake = 0, 0
+
+        if actions[0] > 0:
+            accel = actions[0]
+        else:
+            brake = abs(actions[0])
+
         res = {
-            'accel': actions[0],
-            'brake': actions[1],
-            # 'steer': actions[2]
+            'accel': accel,
+            'brake': brake, 
+            'steer': actions[1]
             }
+
         return res
 
 

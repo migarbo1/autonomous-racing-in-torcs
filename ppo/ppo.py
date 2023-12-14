@@ -37,6 +37,7 @@ class PPO:
         self.critic_opt = Adam(self.critic.parameters(), lr=self.lr)
 
         self.test = test
+        self.current_timesteps = 0
 
 
     def _init_hyperparameters(self):
@@ -47,6 +48,9 @@ class PPO:
         self.clip = 0.2
         self.lr = 0.005
         self.save_ratio = 3
+
+        self.eval_ratio = 15
+        self.eval_max_timesteps = 10000
 
         # advanced hyper parameters 
         self.num_minibatches = 6
@@ -89,6 +93,52 @@ class PPO:
         future_rewards_batch = torch.tensor(future_rewards_batch, dtype=torch.float)
 
         return future_rewards_batch
+
+
+    def launch_eval(self):
+        eval_results = {}
+
+        i = 0
+        max_speed = 0
+        speed_list = []
+        obs_list = []
+        total_reward = 0
+        reward_list = []
+        laps_completed = 0
+        last_lap_time = 0 
+
+        done = False
+        state, _ = self.env.reset(eval=True)
+        while not done and i < self.eval_max_timesteps:
+            action, log_prob = self.get_action(state)
+            state, reward, done, _ ,_ = self.env.step(action)
+
+            total_reward += reward
+            reward_list.append(reward)
+            obs_list.append(self.env.previous_state) #store previous_state so we have all the information. At this time prev_state = obs_after_action
+
+            curr_speed = self.env.previous_state['speedX']
+            speed_list.append(curr_speed)
+            if curr_speed > max_speed:
+                max_speed = curr_speed
+
+            state_last_lap_time = self.env.previous_state['lastLapTime']
+            if state_last_lap_time != last_lap_time:
+                last_lap_time = state_last_lap_time
+                laps_completed += 1
+
+            i+=1
+
+        eval_results['max_speed'] = max_speed
+        eval_results['avg_speed'] = np.mean(speed_list)
+        eval_results['dist_raced'] = obs_list[-1]['distRaced']
+        eval_results['laps_completed'] = laps_completed
+        eval_results['rewards_per_timestep'] = reward_list
+        eval_results['total_reward'] = total_reward
+        eval_results['observation_rollout'] = obs_list
+        eval_results['all_steps_completed'] = i==self.eval_max_timesteps
+
+        self.env.training_data['eval_results'].append(eval_results)
 
 
     def rollout(self):
@@ -190,9 +240,9 @@ class PPO:
 
 
     def learn(self, max_timesteps):
-        current_timesteps = 0
+        self.current_timesteps = 0
         current_iterations = 0
-        while current_timesteps < max_timesteps:
+        while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
             # Compute Advantage using GAE
@@ -203,16 +253,19 @@ class PPO:
             # Normatize advantage to make PPO stable
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
             
-            current_timesteps += np.sum(ep_lengths_batch)
+            self.current_timesteps += np.sum(ep_lengths_batch)
             current_iterations += 1
 
             step = obs_batch.size(0)
             indexes = np.arange(step)
             minibatch_size = step // self.num_minibatches
 
+            iteration_actor_loss = []
+            iteration_critic_loss = []
+
             for _ in range(self.n_updates_per_iteration):
 
-                self.lr_annealing(current_timesteps, max_timesteps)
+                self.lr_annealing(self.current_timesteps, max_timesteps)
 
                 np.random.shuffle(indexes)
                 for start in range(0, step, minibatch_size):
@@ -248,6 +301,10 @@ class PPO:
                     
                     critic_loss = MSELoss()(V, mini_future_rewards)
                 
+                    # save actor and critic loss for logginfg purposes
+                    iteration_actor_loss.append(actor_loss.item())
+                    iteration_critic_loss.append(critic_loss.item())
+
                     # Propagate loss through actor network
                     self.actor_opt.zero_grad()
                     actor_loss.backward(retain_graph=True) #flag needed -> avoids buffer already free error
@@ -264,8 +321,17 @@ class PPO:
                 if approx_kl > self.target_kl:
                     break
             print('current iterations:', current_iterations)
+
+            iteration_avg_actor_loss = np.mean(np.array(iteration_actor_loss))
+            iteration_avg_critic_loss = np.mean(np.array(iteration_critic_loss))
+
+            self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
+            self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
+
+            if current_iterations % self.eval_ratio == 0:
+                self.launch_eval()
+
             if current_iterations % self.save_ratio == 0:
                 print('Models saved')
-                self.env.save_laptimes()
                 torch.save(self.actor.state_dict(), './ppo_actor.pth')
                 torch.save(self.critic.state_dict(), './ppo_critic.pth')

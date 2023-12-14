@@ -82,13 +82,14 @@ version= "20130505-2"
 
 TEXTMODE = True
 
-def restart_torcs(sample = False):
-    mode = random.sample(['race', 'practice'], 1)[0] if sample else 'race'
+def restart_torcs(eval = False):
+    mode = 'eval' if eval else 'train'
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
-    if TEXTMODE:
-        os.system('torcs -nofuel -nodamage -r /usr/local/share/games/torcs/config/raceman/quickrace.xml &') # -noisy 
+    if TEXTMODE and not eval:
+        xmlfile = 'practice.xml' if eval else 'quickrace.xml'
+        os.system(f'torcs -nofuel -nodamage -r /usr/local/share/games/torcs/config/raceman/{xmlfile} &') # -noisy 
     else:
         os.system('torcs -nofuel -nodamage &') # -noisy 
         time.sleep(0.5)
@@ -182,7 +183,7 @@ class Client():
                 print("Count Down : " + str(n_fail))
                 if n_fail < 0:
                     print("relaunch torcs")
-                    restart_torcs(textmode=True)
+                    restart_torcs()
                     n_fail = 5
                 n_fail -= 1
 
