@@ -41,8 +41,8 @@ class PPO:
 
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 4800 # 120
-        self.max_timesteps_per_episode = 1600 # 48
+        self.timesteps_per_batch = 12000 # 120
+        self.max_timesteps_per_episode = 4800 # 48
         self.gamma = 0.99
         self.n_updates_per_iteration = 5
         self.clip = 0.2
@@ -242,6 +242,7 @@ class PPO:
     def learn(self, max_timesteps):
         self.current_timesteps = 0
         current_iterations = 0
+        timesteps_since_save = 0
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
@@ -253,7 +254,10 @@ class PPO:
             # Normatize advantage to make PPO stable
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
             
-            self.current_timesteps += np.sum(ep_lengths_batch)
+            timesteps_in_batch = np.sum(ep_lengths_batch)
+            self.current_timesteps += timesteps_in_batch
+            timesteps_since_save += timesteps_in_batch
+
             current_iterations += 1
 
             step = obs_batch.size(0)
@@ -327,11 +331,15 @@ class PPO:
 
             self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
             self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
+            
 
             if current_iterations % self.eval_ratio == 0:
                 self.launch_eval()
 
             if current_iterations % self.save_ratio == 0:
-                print('Models saved')
+                self.env.training_data['total_training_timesteps'] += timesteps_since_save
+                self.env.save_training_data()
+                timesteps_since_save = 0
                 torch.save(self.actor.state_dict(), './ppo_actor.pth')
                 torch.save(self.critic.state_dict(), './ppo_critic.pth')
+                print('Models saved')
