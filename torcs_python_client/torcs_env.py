@@ -18,14 +18,14 @@ class TorcsEnv:
     def __init__(self, create_client = False) -> None:
         snakeoil.restart_torcs()
 
-        # Action order:[Accel, Brake, steer]  
+        # Action order:[Accel&Brake, steer]  
         action_lows = np.array([-1.0, -1.0])
         action_highs = np.array([1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, accelX, accelY]  
-        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62, -2**62, -2**62], dtype='float')
-        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62, 2**62, 2**62], dtype='float')
+        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
+        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
+        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
         self.client = snakeoil.Client(p=3001) if create_client else None
@@ -82,12 +82,13 @@ class TorcsEnv:
         if min(getattr(self.observation, 'track')) < 0 or \
             np.cos(getattr(self.observation, 'angle')) < 0 or \
             getattr(self.observation, 'speedX') < self.min_speed and self.has_moved:
-            reward = -1000
+
+            reward = -100000
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
         
-        self.has_moved = self.has_moved or getattr(self.observation, 'speedX') > (self.min_speed*2)
+        self.has_moved = self.has_moved or getattr(self.observation, 'speedX') > (self.min_speed*3)
 
         self.time_step += 1
 
@@ -120,26 +121,19 @@ class TorcsEnv:
 
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        speed_reward = abs(state['speedX'] - prev_speed)
+        speed_dif = abs(state['speedX'] - prev_speed)
+        speed_norm = state['speedX']/self.max_speed
+        speed_reward = 2*speed_dif/self.max_speed + speed_norm * np.cos(state['angle'])
 
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
-        angle_variation = abs(state['angle'] - prev_angle)
-        # steer_reward = -10 * (abs(np.sin(state['angle'])) + angle_variation)
-        
-        # reward = speed_reward - abs(np.sin(state['angle']))#+ steer_reward
+        angle_variation = abs(state['angle'] - prev_angle)/PI
 
-        forward_view =(np.mean(state['track'][8:11])/200)
-
-        vertical_speed = state['speedX'] * abs(np.cos(state['angle']))
-        horizontal_speed = state['speedX'] * abs(np.sin(state['angle']))
-
-        reward = speed_reward + (vertical_speed + horizontal_speed )/self.max_speed \
-            - angle_variation
+        reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
-        print(f'v_sp: {vertical_speed/self.max_speed:4f}; h_sp: {horizontal_speed/self.max_speed:4f}; delta: {angle_variation:4f}; REWARD: {reward:4f}')
+        print(f'delta_sp: {speed_dif:4f}; %_sp: {speed_norm:4f}; track_pos: {abs(state["trackPos"])}; Reward: {reward:4f}')
 
         return reward
 
@@ -169,8 +163,6 @@ class TorcsEnv:
         res.append(getattr(observation, 'speedZ'))
         res = res + list(getattr(observation, 'track'))
         res.append(getattr(observation, 'trackPos'))
-        res.append(getattr(observation, 'accelX'))
-        res.append(getattr(observation, 'accelY'))
         return np.array(res)
 
 
@@ -196,13 +188,8 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
-        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos', 'accelX', 'accelY']
+        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
         observation = collections.namedtuple('observation', keys)
-
-        prev_speedx = self.previous_state['speedX'] if self.previous_state != None else 0
-        prev_time = self.previous_state['curLapTime'] if self.previous_state != None else 0
-        accelX = (obs_dict['speedX'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
-        accelY = (obs_dict['speedY'] - prev_speedx) / (obs_dict['curLapTime'] - prev_time) if obs_dict['curLapTime'] - prev_time != 0 else 0
 
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
@@ -210,7 +197,5 @@ class TorcsEnv:
             speedY=np.array(obs_dict['speedY'], dtype=np.float32)/self.max_speed,
             speedZ=np.array(obs_dict['speedZ'], dtype=np.float32)/self.max_speed,
             track=np.array(obs_dict['track'], dtype=np.float32)/200.,
-            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32),
-            accelX=np.array(accelX, dtype=np.float32),
-            accelY=np.array(accelY, dtype=np.float32)
+            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32)
         )

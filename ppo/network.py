@@ -13,10 +13,6 @@ class FeedForwardNN(nn.Module):
         self.hidden_layer2 = nn.Linear(128, 64)
         self.output_layer = nn.Linear(64, out_dim)
 
-        self.do1 = nn.Dropout(0.2)
-        self.do2 = nn.Dropout(0.2)
-        self.do3 = nn.Dropout(0.1)
-
 
     def forward(self, observation: np.ndarray):
         if isinstance(observation, np.ndarray):
@@ -25,13 +21,8 @@ class FeedForwardNN(nn.Module):
             observation_tensor = observation
 
         act1 = F.relu(self.input_layer(observation_tensor))
-        act1 = self.do1(act1) if self.training else act1
-
         act2 = F.relu(self.hidden_layer1(act1))
-        act2 = self.do2(act2) if self.training else act2
-
         act3 = F.relu(self.hidden_layer2(act2))
-        act3 = self.do3(act3) if self.training else act3
         
         out = F.tanh(self.output_layer(act3))
 
