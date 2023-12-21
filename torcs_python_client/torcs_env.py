@@ -40,15 +40,15 @@ class TorcsEnv:
 
 
     def load_training_data(self):
-        if os.path.isfile(f'{os.getcwd()}/training_data.pickle'):
-            with open(f'{os.getcwd()}/training_data.pickle', 'rb') as file:
+        if os.path.isfile(f'{os.getcwd()}/finetuning_data.pickle'):
+            with open(f'{os.getcwd()}/finetuning_data.pickle', 'rb') as file:
                 return pickle.load(file)
         else:
             return {"total_training_timesteps": 0.0, "actor_episodic_avg_loss": [], "critic_episodic_avg_loss": [], "eval_results": []}
 
 
     def save_training_data(self):
-        with open(f'{os.getcwd()}/training_data.pickle', 'wb') as file:
+        with open(f'{os.getcwd()}/finetuning_data.pickle', 'wb') as file:
             pickle.dump(self.training_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -81,7 +81,8 @@ class TorcsEnv:
         # episode termination conditions: out of track or running backwards ¿small progress?
         if min(getattr(self.observation, 'track')) < 0 or \
             np.cos(getattr(self.observation, 'angle')) < 0 or \
-            getattr(self.observation, 'speedX') < self.min_speed and self.has_moved:
+            getattr(self.observation, 'speedX') < self.min_speed and self.has_moved or \
+            self.client.S.d['damage'] > 0:
 
             reward = -100000
             done = True
@@ -123,7 +124,7 @@ class TorcsEnv:
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
         speed_dif = abs(state['speedX'] - prev_speed)
         speed_norm = state['speedX']/self.max_speed
-        speed_reward = 2*speed_dif/self.max_speed + speed_norm * np.cos(state['angle'])
+        speed_reward = 2*speed_dif/self.max_speed + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))
 
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
         angle_variation = abs(state['angle'] - prev_angle)/PI

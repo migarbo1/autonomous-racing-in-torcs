@@ -29,7 +29,7 @@ class PPO:
             self.critic.load_state_dict(torch.load('./ppo_critic.pth'))
 
         # create the covariance matrix for continuous action space
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.25)
         self.cov_mat = torch.diag(self.cov_var)
 
         # Define the optimizers

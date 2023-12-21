@@ -81,17 +81,19 @@ usage= usage + ophelp
 version= "20130505-2"
 
 TEXTMODE = True
+TRACKS = ['quickrace', 'ncrace', 'endrace']
 
 def restart_torcs(eval = False):
-    mode = 'eval' if eval else 'train'
+    global TEXTMODE, TRACKS
+    print(TRACKS)
+    mode = random.sample(TRACKS ,1)[0] # alpine 1, wheel 2, E-track 6
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
-    if TEXTMODE and not eval:
-        xmlfile = 'practice.xml' if eval else 'quickrace.xml'
-        os.system(f'torcs -nofuel -nodamage -r /usr/local/share/games/torcs/config/raceman/{xmlfile} &') # -noisy 
+    if TEXTMODE and not eval: 
+        os.system(f'torcs -nofuel -r /usr/local/share/games/torcs/config/raceman/{mode}.xml &') # -noisy 
     else:
-        os.system('torcs -nofuel -nodamage &') # -noisy 
+        os.system('torcs -nofuel &') # -noisy 
         time.sleep(0.5)
         os.system(f'sh {os.getcwd()}/torcs_python_client/autostart_{mode}.sh')
         time.sleep(0.5)
@@ -100,6 +102,22 @@ def clip(v,lo,hi):
     if v<lo: return lo
     elif v>hi: return hi
     else: return v
+
+@staticmethod
+def set_textmode(is_text = True):
+    global TEXTMODE
+    TEXTMODE = is_text
+
+@staticmethod
+def set_tracks(track_list):
+    global TRACKS
+    TRACKS = track_list
+    print(TRACKS)
+
+@staticmethod
+def kill_torcs():
+    os.system(f'pkill torcs')
+    time.sleep(0.5)
 
 def bargraph(x,mn,mx,w,c='X'):
     '''Draws a simple asciiart bar graph. Very handy for
