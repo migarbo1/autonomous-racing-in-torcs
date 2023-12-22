@@ -81,18 +81,19 @@ usage= usage + ophelp
 version= "20130505-2"
 
 TEXTMODE = True
-TRACKS = ['quickrace', 'ncrace', 'endrace']
+TRACKS = ['quickrace', 'ncrace', 'endrace'] # alpine 1, wheel 2, E-track 6
 
 def restart_torcs(eval = False):
     global TEXTMODE, TRACKS
     print(TRACKS)
-    mode = random.sample(TRACKS ,1)[0] # alpine 1, wheel 2, E-track 6
+    mode = random.sample(TRACKS ,1)[0] 
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
     if TEXTMODE and not eval: 
         os.system(f'torcs -nofuel -r /usr/local/share/games/torcs/config/raceman/{mode}.xml &') # -noisy 
     else:
+        mode = 'practice' if eval else mode
         os.system('torcs -nofuel &') # -noisy 
         time.sleep(0.5)
         os.system(f'sh {os.getcwd()}/torcs_python_client/autostart_{mode}.sh')
