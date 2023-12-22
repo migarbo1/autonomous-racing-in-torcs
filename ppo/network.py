@@ -24,6 +24,10 @@ class FeedForwardNN(nn.Module):
         act2 = F.relu(self.hidden_layer1(act1))
         act3 = F.relu(self.hidden_layer2(act2))
         
-        out = F.tanh(self.output_layer(act3))
+        
+        out = self.output_layer(act3)
+
+        if out.size()[0] > 1:
+            out = F.tanh(out)
 
         return out

@@ -21,12 +21,12 @@ class PPO:
         # Initialize actor and critic networks
         self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
         self.critic = FeedForwardNN(self.obs_dim, 1)
-        if os.path.isfile('./ppo_actor.pth'):
+        if os.path.isfile('./weights/ppo_actor.pth'):
             print('loading actor weights ....')
-            self.actor.load_state_dict(torch.load('./ppo_actor.pth'))
-        if os.path.isfile('./ppo_critic.pth'):
+            self.actor.load_state_dict(torch.load('./weights/ppo_actor.pth'))
+        if os.path.isfile('./weights/ppo_critic.pth'):
             print('loading critic weights ....')
-            self.critic.load_state_dict(torch.load('./ppo_critic.pth'))
+            self.critic.load_state_dict(torch.load('./weights/ppo_critic.pth'))
 
         # create the covariance matrix for continuous action space
         self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.25)
@@ -340,6 +340,6 @@ class PPO:
                 self.env.training_data['total_training_timesteps'] += timesteps_since_save
                 self.env.save_training_data()
                 timesteps_since_save = 0
-                torch.save(self.actor.state_dict(), './ppo_actor.pth')
-                torch.save(self.critic.state_dict(), './ppo_critic.pth')
+                torch.save(self.actor.state_dict(), './weights/ppo_actor.pth')
+                torch.save(self.critic.state_dict(), './weights/ppo_critic.pth')
                 print('Models saved')

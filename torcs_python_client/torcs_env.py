@@ -38,17 +38,19 @@ class TorcsEnv:
 
         self.training_data = self.load_training_data()
 
+        self.last_lap_time = 0
+
 
     def load_training_data(self):
-        if os.path.isfile(f'{os.getcwd()}/finetuning_data.pickle'):
-            with open(f'{os.getcwd()}/finetuning_data.pickle', 'rb') as file:
+        if os.path.isfile(f'{os.getcwd()}/training_data.pickle'):
+            with open(f'{os.getcwd()}/training_data.pickle', 'rb') as file:
                 return pickle.load(file)
         else:
             return {"total_training_timesteps": 0.0, "actor_episodic_avg_loss": [], "critic_episodic_avg_loss": [], "eval_results": []}
 
 
     def save_training_data(self):
-        with open(f'{os.getcwd()}/finetuning_data.pickle', 'wb') as file:
+        with open(f'{os.getcwd()}/training_data.pickle', 'wb') as file:
             pickle.dump(self.training_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -89,7 +91,7 @@ class TorcsEnv:
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
         
-        self.has_moved = self.has_moved or getattr(self.observation, 'speedX') > (self.min_speed*3)
+        self.has_moved = self.has_moved or getattr(self.observation, 'speedX') > (self.min_speed*5)
 
         self.time_step += 1
 
@@ -131,6 +133,10 @@ class TorcsEnv:
 
         reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
+
+        if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
+            reward += 100
+            self.last_lap_time = state['lastLapTime']
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
