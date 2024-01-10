@@ -5,13 +5,19 @@ import torch
 
 
 class FeedForwardNN(nn.Module):
-    def __init__(self, in_dim, out_dim, training = False):
+    def __init__(self, in_dim, out_dim, drop_rate = 0.1, training = False):
         super(FeedForwardNN, self).__init__()
 
-        self.input_layer = nn.Linear(in_dim, 256)
-        self.hidden_layer1 = nn.Linear(256, 128)
-        self.hidden_layer2 = nn.Linear(128, 64)
-        self.output_layer = nn.Linear(64, out_dim)
+        self.input_layer = nn.Linear(in_dim, 512)
+        self.hidden_layer1 = nn.Linear(512, 256)
+        self.hidden_layer2 = nn.Linear(256, 128)
+        self.output_layer = nn.Linear(128, out_dim)
+
+        self.training = training
+
+        self.drop1 = nn.Dropout(p=drop_rate)
+        self.drop2 = nn.Dropout(p=drop_rate)
+        self.drop3 = nn.Dropout(p=drop_rate)
 
 
     def forward(self, observation: np.ndarray):
@@ -21,8 +27,13 @@ class FeedForwardNN(nn.Module):
             observation_tensor = observation
 
         act1 = F.relu(self.input_layer(observation_tensor))
+        act1 = self.drop1(act1) if self.training else act1
+        
         act2 = F.relu(self.hidden_layer1(act1))
+        act2 = self.drop2(act2) if self.training else act2
+
         act3 = F.relu(self.hidden_layer2(act2))
+        act3 = self.drop1(act3) if self.training else act3
         
         
         out = self.output_layer(act3)

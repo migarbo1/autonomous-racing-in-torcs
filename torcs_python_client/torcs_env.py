@@ -16,7 +16,7 @@ PI = snakeoil.PI
 class TorcsEnv:
 
     def __init__(self, create_client = False) -> None:
-        snakeoil.restart_torcs()
+        # snakeoil.restart_torcs()
 
         # Action order:[Accel&Brake, steer]  
         action_lows = np.array([-1.0, -1.0])
@@ -86,7 +86,7 @@ class TorcsEnv:
             getattr(self.observation, 'speedX') < self.min_speed and self.has_moved or \
             self.client.S.d['damage'] > 0:
 
-            reward = -100000
+            reward = -100000000
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
@@ -106,13 +106,13 @@ class TorcsEnv:
         self.time_step = 0
         self.has_moved = False
 
-        if self.client:
-            self.client.R.d['meta'] = 1
-            self.client.respond_to_server()
+        # if self.client:
+            # self.client.R.d['meta'] = 1
+            # self.client.respond_to_server()
 
             # TO avoid memory leak re-launch torcs from time to time
             #if random.random() < 0.33:
-            snakeoil.restart_torcs(eval)
+        snakeoil.restart_torcs(eval)
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
@@ -125,39 +125,40 @@ class TorcsEnv:
     def compute_reward(self, state):
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
         speed_dif = abs(state['speedX'] - prev_speed)
-        speed_norm = state['speedX']/self.max_speed
-        speed_reward = 2*speed_dif/self.max_speed + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))
+        speed_norm = state['speedX']
+        speed_reward = 2*speed_dif + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))
 
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
-        angle_variation = abs(state['angle'] - prev_angle)/PI
+        angle_variation = 2*abs(state['angle'] - prev_angle)
 
         reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
 
         if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
-            reward += 100
+            delta = self.last_lap_time - state['lastLapTime']
+            reward = reward + 10000 if delta < 0 else reward + 10000 * delta
             self.last_lap_time = state['lastLapTime']
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
-        print(f'delta_sp: {speed_dif:4f}; %_sp: {speed_norm:4f}; track_pos: {abs(state["trackPos"])}; Reward: {reward:4f}')
+        print(f'sp_reward: {speed_reward:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
 
         return reward
 
 
     def compute_gear(self, speed):
         gear = 1
-        if speed > 115:
+        if speed > 110:
             gear = 2
-        if speed > 140:
+        if speed > 130:
             gear = 3
-        if speed > 190:
+        if speed > 180:
             gear = 4
-        if speed > 240:
+        if speed > 230:
             gear = 5
-        if speed > 270:
+        if speed > 260:
             gear = 6
-        if speed > 300:
+        if speed > 290:
             gear = 7
         return gear
 

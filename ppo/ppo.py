@@ -9,7 +9,7 @@ import os
 
 
 class PPO:
-    def __init__(self, env, test = False) -> None:
+    def __init__(self, env, variance=0.35, test = False) -> None:
         # Set hyperparameters
         self._init_hyperparameters()
         
@@ -28,9 +28,8 @@ class PPO:
             print('loading critic weights ....')
             self.critic.load_state_dict(torch.load('./weights/ppo_critic.pth'))
 
-        # create the covariance matrix for continuous action space
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.25)
-        self.cov_mat = torch.diag(self.cov_var)
+        self.variance = variance if not test else 0.05
+        self.curr_variance = variance if not test else 0.05
 
         # Define the optimizers
         self.actor_opt = Adam(self.actor.parameters(), lr=self.lr)
@@ -41,8 +40,8 @@ class PPO:
 
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 12000 # 120
-        self.max_timesteps_per_episode = 4800 # 48
+        self.timesteps_per_batch = 9600 # 48
+        self.max_timesteps_per_episode = 3200 # 16
         self.gamma = 0.99
         self.n_updates_per_iteration = 5
         self.clip = 0.2
@@ -64,8 +63,12 @@ class PPO:
         mean = self.actor(state)
 
         # print('Action means: ', mean)
+        
+        # create the covariance matrix for continuous multi action space
+        cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
+        cov_mat = torch.diag(cov_var)
 
-        distribution = MultivariateNormal(mean, self.cov_mat)   
+        distribution = MultivariateNormal(mean, cov_mat)
 
         # Sample an action from the distribution and get its log prob
         action = distribution.sample()
@@ -171,7 +174,6 @@ class PPO:
                 
                 val = self.critic(state)
 
-                #TODO: see if ours needs also 5 args
                 state, reward, done, _ ,_ = self.env.step(action)
 
                 ep_vals.append(val.flatten())
@@ -187,6 +189,8 @@ class PPO:
             val_batch.append(ep_vals)
             dones_batch.append(ep_dones)
 
+        self.env.kill_torcs()
+
         obs_batch = torch.tensor(np.array(obs_batch), dtype=torch.float)
         act_batch = torch.tensor(np.array(act_batch), dtype=torch.float)
         logprob_batch = torch.tensor(np.array(logprob_batch), dtype=torch.float).flatten()
@@ -200,7 +204,12 @@ class PPO:
 
         # get logprobs using last actor network
         mean = self.actor(obs_batch)
-        distribution = MultivariateNormal(mean, self.cov_mat)
+
+        cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
+        cov_mat = torch.diag(cov_var)
+
+        distribution = MultivariateNormal(mean, cov_mat)
+
         logprobs = distribution.log_prob(act_batch)
 
         # Squeeze because we have shape(timesteps_per_batch, 1) and we hant only a 1d array 
@@ -213,6 +222,11 @@ class PPO:
         new_lr = max(new_lr, 0.0)
         self.actor_opt.param_groups[0]["lr"] = new_lr
         self.critic_opt.param_groups[0]["lr"] = new_lr
+
+    def variance_decay(self, cur_timesteps, max_timesteps):
+        frac = (cur_timesteps - 1.0) / max_timesteps
+        self.curr_variance = self.variance * (1 - frac)
+        self.curr_variance = max(self.curr_variance, 0.05)
 
 
     def compute_gae(self, rewards_in_batch, values_in_batch, dones_in_batch):
@@ -270,6 +284,7 @@ class PPO:
             for _ in range(self.n_updates_per_iteration):
 
                 self.lr_annealing(self.current_timesteps, max_timesteps)
+                self.variance_decay(self.current_timesteps, max_timesteps)
 
                 np.random.shuffle(indexes)
                 for start in range(0, step, minibatch_size):

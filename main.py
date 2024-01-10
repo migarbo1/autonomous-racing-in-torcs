@@ -13,7 +13,7 @@ def training_finished_procedure(env: TorcsEnv, model: PPO):
 if __name__ == '__main__':
     env = TorcsEnv()
     #TODO: make console parameter
-    timesteps = 15000000
+    timesteps = 6000000
     model = PPO(env)
     try:
         model.learn(timesteps)
