@@ -186,7 +186,7 @@ class Client():
         n_fail = 5
         while True:
             # This string establishes track sensor angles! You can customize them.
-            a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"
+            a= "-45 -32 -16 -12 -8 -6 -4 -2 -1 0 1 2 4 6 8 12 16 32 45"
             initmsg='%s(init %s)' % (self.sid,a)
 
             try:
