@@ -91,7 +91,7 @@ def restart_torcs(eval = False):
     os.system(f'pkill torcs')
     time.sleep(0.5)
     if TEXTMODE and not eval: 
-        os.system(f'torcs -nofuel -r /usr/local/share/games/torcs/config/raceman/{mode}.xml &') # -noisy 
+        os.system(f'torcs -nofuel -r {os.getcwd()}/configs/{mode}.xml &') # -noisy 
     else:
         mode = 'practice' if eval and TEXTMODE else mode
         os.system('torcs -nofuel &') # -noisy 
