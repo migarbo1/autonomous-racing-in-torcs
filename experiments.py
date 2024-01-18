@@ -32,7 +32,7 @@ def write_results(results):
 if __name__ == '__main__':
     snakeoil.set_textmode(False)
     snakeoil.set_tracks(track_list=['quickrace'])
-    tracks = ['g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-1', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'etrack-3']
+    tracks = ['g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-1', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3']
     results= {}
     prev_track = tracks[0]
     for track in tracks:
@@ -55,5 +55,5 @@ if __name__ == '__main__':
             avg_speeds.append(model.env.training_data['eval_results'][-1]['avg_speed'])
             max_speeds.append(model.env.training_data['eval_results'][-1]['max_speed'])
         prev_track = track
-        results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances)}, avg_rollout_dist: {np.mean(rollout_distances)}, min_rollout_dist: {np.min(rollout_distances)}, max_score: {np.max(rollout_rewards)}, avg_score: {np.mean(rollout_rewards)}, avg_max_speed: {np.mean(max_speeds)}, avg_avg_speed: {np.mean(avg_speeds)}' + '}'
+        results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances):4f}, avg_rollout_dist: {np.mean(rollout_distances):4f}, min_rollout_dist: {np.min(rollout_distances):4f}, max_score: {np.max(rollout_rewards):4f}, avg_score: {np.mean(rollout_rewards):4f}, avg_max_speed: {np.mean(max_speeds):4f}, avg_avg_speed: {np.mean(avg_speeds):4f}' + '}'
     write_results(results)

@@ -23,7 +23,7 @@ class TorcsEnv:
         action_highs = np.array([1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
-        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos, turn_angle: currently removed, tgt_speed:currently removed]  
+        # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
         observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
         observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
@@ -38,7 +38,9 @@ class TorcsEnv:
 
         self.training_data = self.load_training_data()
 
-        self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
+        self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
+        # self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
+        # self.vision_angles = [-45, -32, -24, -12, -8, -6, -4, -2, -1, 0, 1, 2, 4, 6, 8, 12, 24, 32, 45]
 
         self.last_lap_time = 0
 
@@ -128,12 +130,11 @@ class TorcsEnv:
         prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
         speed_dif = abs(state['speedX'] - prev_speed)
         speed_norm = state['speedX']
-        speed_reward = 2*speed_dif + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))
+        speed_reward = 2*speed_dif + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))#  - state['speedY']*np.cos(state['angle'])
         
         prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
         angle_variation = 2*abs(state['angle'] - prev_angle)
 
-        max_track_offset = 0 - abs(self.vision_angles[np.argmax(state['track'])]) # TODO: test once angles are validated
 
         reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
@@ -149,38 +150,6 @@ class TorcsEnv:
 
         return reward
 
-    def compute_turn_angle(self, left, front, right, ang_l, ang_r):
-        
-        if left > front: #turn to left
-            k = (np.sin(ang_l*PI/180.)*left) / (front-np.cos(1*PI/180.)*left)
-            turn_angle = np.arctan(k)
-        elif right > front: # turn right
-            k = (np.sin(ang_r*PI/180.)*front) / (right-np.cos(1*PI/180.)*front)
-            turn_angle = np.arctan(k)
-        else:
-            turn_angle = 0
-        print(f'turn_angle = {turn_angle*180./PI}')
-
-        return turn_angle
-
-    def compute_target_speed(self, track):
-        
-        tgt_front = np.argmax(track[1:-1])
-        front = track[tgt_front]
-        left = track[tgt_front-1]
-        right = track[tgt_front+1]
-        ang_l = abs(self.vision_angles[tgt_front] - self.vision_angles[tgt_front-1])
-        ang_r = abs(self.vision_angles[tgt_front] - self.vision_angles[tgt_front+1])
-
-        turn_angle = self.compute_turn_angle(left, front, right, ang_l, ang_r)
-
-        delta = abs((turn_angle*180./PI) / 9.)
-        tgt_speed = pow(front/self.max_speed, delta)*(self.max_speed-35)+35 
-
-        print(f'turn_angle: {turn_angle}, delta: {delta}')
-        print('tgt_speed: ', tgt_speed)
-
-        return tgt_speed
 
     def compute_gear(self, speed):
         gear = 1
@@ -207,8 +176,6 @@ class TorcsEnv:
         res.append(getattr(observation, 'speedZ'))
         res = res + list(getattr(observation, 'track'))
         res.append(getattr(observation, 'trackPos'))
-        # res.append(getattr(observation, 'turn_angle'))
-        # res.append(getattr(observation, 'tgt_speed'))
         return np.array(res)
 
 
@@ -234,10 +201,8 @@ class TorcsEnv:
 
 
     def parse_torcs_input(self, obs_dict: dict):
-        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']#, 'turn_angle']#, 'tgt_speed']
+        keys = ['angle', 'speedX', 'speedY', 'speedZ', 'track', 'trackPos']
         observation = collections.namedtuple('observation', keys)
-        # turn_angle = self.compute_turn_angle(*obs_dict['track'][8:11], 1, 1)
-        # tgt_speed = self.compute_target_speed(obs_dict['track'])
 
         return observation(
             angle=np.array(obs_dict['angle'], dtype=np.float32)/PI,
@@ -245,7 +210,5 @@ class TorcsEnv:
             speedY=np.array(obs_dict['speedY'], dtype=np.float32)/self.max_speed,
             speedZ=np.array(obs_dict['speedZ'], dtype=np.float32)/self.max_speed,
             track=np.array(obs_dict['track'], dtype=np.float32)/200.,
-            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32),
-            # turn_angle=np.array(turn_angle, dtype=np.float32)/PI,
-            # tgt_speed = np.array(tgt_speed, dtype=np.float32)/self.max_speed
+            trackPos=np.array(obs_dict['trackPos'], dtype=np.float32)
         )
