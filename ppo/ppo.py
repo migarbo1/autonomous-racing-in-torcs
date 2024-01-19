@@ -48,7 +48,7 @@ class PPO:
         self.lr = 0.005
         self.save_ratio = 3
 
-        self.eval_ratio = 15
+        self.eval_ratio = 5
         self.eval_max_timesteps = 10000
 
         # advanced hyper parameters 
@@ -257,6 +257,7 @@ class PPO:
         self.current_timesteps = 0
         current_iterations = 0
         timesteps_since_save = 0
+        best_reward = -np.inf
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
@@ -339,22 +340,21 @@ class PPO:
 
                 if approx_kl > self.target_kl:
                     break
-            print('current iterations:', current_iterations)
 
             iteration_avg_actor_loss = np.mean(np.array(iteration_actor_loss))
             iteration_avg_critic_loss = np.mean(np.array(iteration_critic_loss))
 
             self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
             self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
-            
 
             if current_iterations % self.eval_ratio == 0:
                 self.launch_eval()
-
-            if current_iterations % self.save_ratio == 0:
-                self.env.training_data['total_training_timesteps'] += timesteps_since_save
-                self.env.save_training_data()
-                timesteps_since_save = 0
-                torch.save(self.actor.state_dict(), './weights/ppo_actor.pth')
-                torch.save(self.critic.state_dict(), './weights/ppo_critic.pth')
-                print('Models saved')
+                rollout_reward = sum(self.env.training_data['eval_results'][-1]['rewards_per_timestep'][:-1])
+                if rollout_reward > best_reward:
+                    best_reward = rollout_reward
+                    self.env.training_data['total_training_timesteps'] += timesteps_since_save
+                    self.env.save_training_data()
+                    timesteps_since_save = 0
+                    torch.save(self.actor.state_dict(), './weights/ppo_actor.pth')
+                    torch.save(self.critic.state_dict(), './weights/ppo_critic.pth')
+                    print('Models saved')

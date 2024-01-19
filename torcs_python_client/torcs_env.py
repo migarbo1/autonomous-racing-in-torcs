@@ -15,7 +15,7 @@ PI = snakeoil.PI
 
 class TorcsEnv:
 
-    def __init__(self, create_client = False) -> None:
+    def __init__(self, create_client = False, num_frames=5) -> None:
         # snakeoil.restart_torcs()
 
         # Action order:[Accel&Brake, steer]  
@@ -23,15 +23,20 @@ class TorcsEnv:
         action_highs = np.array([1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
+        self.num_frames = num_frames
+
         # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
-        observation_lows = np.array([-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62], dtype='float')
-        observation_highs = np.array([PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62], dtype='float')
+        self.single_obs_lows = [-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62]
+        self.single_obs_highs = [PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62]
+        observation_lows = np.array(2*self.single_obs_lows, dtype='float')
+        observation_highs = np.array(2*self.single_obs_highs, dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
         self.client = snakeoil.Client(p=3001) if create_client else None
         self.time_step = 0
-        self.max_speed = 330.
+        self.max_speed = 300.
         self.previous_state = None
+        self.frame_stacking = [np.zeros(len(self.single_obs_lows),) for _ in range(self.num_frames)]
 
         self.has_moved = False
         self.min_speed = 3/self.max_speed
@@ -41,7 +46,8 @@ class TorcsEnv:
         self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
         # self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
         # self.vision_angles = [-45, -32, -24, -12, -8, -6, -4, -2, -1, 0, 1, 2, 4, 6, 8, 12, 24, 32, 45]
-
+        # self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
+    
         self.last_lap_time = 0
 
 
@@ -90,7 +96,7 @@ class TorcsEnv:
             getattr(self.observation, 'speedX') < self.min_speed and self.has_moved or \
             self.client.S.d['damage'] > 0:
 
-            reward = -100000000
+            reward = -10000
             done = True
             self.client.R.d['meta'] = True
             self.client.respond_to_server()
@@ -103,50 +109,73 @@ class TorcsEnv:
 
         # print('RECEIVED OBSERVATION:', self.observation)
 
-        return self.observation2array(self.observation), reward, done, None, None # last Nones to compy with gym syntax
+        obs_array = self.observation2array(self.observation)
+        self.append_state_to_stack(obs_array)
+
+        complete_obs = self.get_complete_obs()
+
+        return np.array(complete_obs), reward, done, None, None # last Nones to compy with gym syntax
 
     
     def reset(self, eval = False):
         self.time_step = 0
         self.has_moved = False
+        self.previous_state = None
+        self.frame_stacking = [np.zeros(len(self.single_obs_lows),) for _ in range(self.num_frames)]
 
-        # if self.client:
-            # self.client.R.d['meta'] = 1
-            # self.client.respond_to_server()
-
-            # TO avoid memory leak re-launch torcs from time to time
-            #if random.random() < 0.33:
         snakeoil.restart_torcs(eval)
         
         self.client = snakeoil.Client(p=3001)
         self.client.MAX_STEPS = np.inf
 
         self.observation = self.client.get_servers_input()
+        obs_array = self.observation2array(self.parse_torcs_input(self.observation))
+        self.append_state_to_stack(obs_array)
+        complete_obs = self.get_complete_obs()
 
-        return self.observation2array(self.parse_torcs_input(self.observation)), None # to comply with Gym standard
+        return np.array(complete_obs), None # to comply with Gym standard
+
+
+    def get_complete_obs(self):
+        res = []
+
+        for i in range(len(self.frame_stacking[-1])):
+            res.append(self.frame_stacking[-1][i])
+            res.append(self.frame_stacking[-1][i] - self.frame_stacking[0][i])
+        
+        return res
+
+
+    def append_state_to_stack(self, state):
+        aux = self.frame_stacking[1:]
+        aux.append(state)
+        self.frame_stacking = aux.copy()
 
 
     def compute_reward(self, state):
-        prev_speed = self.previous_state['speedX'] if self.previous_state != None else 0
-        speed_dif = abs(state['speedX'] - prev_speed)
-        speed_norm = state['speedX']
-        speed_reward = 2*speed_dif + speed_norm * (np.cos(state['angle']) - np.sin(abs(state['angle'])))#  - state['speedY']*np.cos(state['angle'])
+        # get speed of first frame of stack
+        prev_speed = self.frame_stacking[0][1]
+        speed_x = state['speedX']/self.max_speed
+        speed_y = state['speedY']/self.max_speed
+        angle = state['angle']/PI
+        speed_dif = abs(speed_x - prev_speed)
+        speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - speed_y*np.cos(angle)
         
-        prev_angle = self.previous_state['angle'] if self.previous_state != None else 0 
-        angle_variation = 2*abs(state['angle'] - prev_angle)
+        # get angle of first frame of stack
+        prev_angle = self.frame_stacking[0][0]
+        angle_variation = 5*abs(angle - prev_angle) # TODO: el problema del waving puede ser que mira el t-5 y no el numero de veces que cambia el angulo entre t-5 y t
 
 
         reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
 
         if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
-            delta = self.last_lap_time - state['lastLapTime']
-            reward = reward + 10000 if delta < 0 else reward + 10000 * delta
+            reward = reward + 100
             self.last_lap_time = state['lastLapTime']
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
-        print(f'sp_reward: {speed_reward:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
+        print(f'sp_reward: {speed_reward:4f}; delta_sp: {speed_dif:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
 
         return reward
 

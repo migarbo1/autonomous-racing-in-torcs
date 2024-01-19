@@ -87,6 +87,7 @@ def restart_torcs(eval = False):
     global TEXTMODE, TRACKS
     print(TRACKS)
     mode = random.sample(TRACKS ,1)[0] 
+    print(mode)
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
@@ -188,7 +189,7 @@ class Client():
             # This string establishes track sensor angles! You can customize them.
             a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"       # Initial test
             # a= "-45 -19 -12 -7 -4 -2.5 -1.7 -1 -.5 0 .5 1 1.7 2.5 4 7 12 19 45"       # TODO: these are the angles used by all the comunity 
-            # a= "-45 -32 -24 -12 -8 -6 -4 -2 -1 0 1 2 4 6 8 12 24 32 45"               # seccond test: tends to worsen the performance although agent learns to brake
+            # a= "-55 -40 -25 -11 -7 -4 -2.8 -1.5 -.5 0 .5 1.5 2.8 4 7 11 25 40 55"     # TODO: seccond test
 
             initmsg='%s(init %s)' % (self.sid,a)
 
@@ -263,13 +264,13 @@ class Client():
         sockdata= str()
 
         while True:
-            try:
+            # try:
                 # Receive server data
-                sockdata,addr= self.so.recvfrom(data_size)
-                sockdata = sockdata.decode('utf-8')
-            except socket.error as emsg:
-                print('error in reading socket')
-                print('.', end=' ')
+            sockdata,addr= self.so.recvfrom(data_size)
+            sockdata = sockdata.decode('utf-8')
+            # except socket.error as emsg:
+            #     print('error in reading socket')
+            #     print('.', end=' ')
                 #print "Waiting for data on %d.............." % self.port
             if '***identified***' in sockdata:
                 print("Client connected on %d.............." % self.port)
