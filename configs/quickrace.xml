@@ -26,7 +26,7 @@
   <section name="Tracks">
     <attnum name="maximum number" val="1"/>
     <section name="1">
-      <attstr name="name" val="corkscrew"/>
+      <attstr name="name" val="eroad"/>
       <attstr name="category" val="road"/>
     </section>
 

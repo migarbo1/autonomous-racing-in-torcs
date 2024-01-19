@@ -32,7 +32,7 @@ def write_results(results):
 if __name__ == '__main__':
     snakeoil.set_textmode(False)
     snakeoil.set_tracks(track_list=['quickrace'])
-    tracks = ['g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-1', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3']
+    tracks = ['brondehach','g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-1', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3']
     results= {}
     prev_track = tracks[0]
     for track in tracks:
@@ -42,18 +42,22 @@ if __name__ == '__main__':
         avg_speeds = []
         max_speeds = []
         for i in range(5):
-            env = TorcsEnv()
-            model = PPO(env, test=True)
-            model.eval_max_timesteps = 500000
-            model.launch_eval()
-            env.kill_torcs()
-            rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])
-            
-            r = compute_reward(model.env.training_data['eval_results'][-1]['observation_rollout'])
-            rollout_rewards.append(r)
-            
-            avg_speeds.append(model.env.training_data['eval_results'][-1]['avg_speed'])
-            max_speeds.append(model.env.training_data['eval_results'][-1]['max_speed'])
+            try:
+                env = TorcsEnv()
+                model = PPO(env, test=True)
+                model.eval_max_timesteps = 500000
+                model.launch_eval()
+                env.kill_torcs()
+                rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])
+                
+                r = compute_reward(model.env.training_data['eval_results'][-1]['observation_rollout'])
+                rollout_rewards.append(r)
+                
+                avg_speeds.append(model.env.training_data['eval_results'][-1]['avg_speed'])
+                max_speeds.append(model.env.training_data['eval_results'][-1]['max_speed'])
+            except:
+                pass
         prev_track = track
         results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances):4f}, avg_rollout_dist: {np.mean(rollout_distances):4f}, min_rollout_dist: {np.min(rollout_distances):4f}, max_score: {np.max(rollout_rewards):4f}, avg_score: {np.mean(rollout_rewards):4f}, avg_max_speed: {np.mean(max_speeds):4f}, avg_avg_speed: {np.mean(avg_speeds):4f}' + '}'
     write_results(results)
+    change_track('brondehach', tracks[-1])
