@@ -4,6 +4,7 @@ from .network import FeedForwardNN
 from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
+import random
 import torch
 import os
 
@@ -21,6 +22,8 @@ class PPO:
         # Initialize actor and critic networks
         self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
         self.critic = FeedForwardNN(self.obs_dim, 1)
+        self.actor.to('cuda')
+        self.critic.to('cuda')
         if os.path.isfile('./weights/ppo_actor.pth'):
             print('loading actor weights ....')
             self.actor.load_state_dict(torch.load('./weights/ppo_actor.pth'))
@@ -77,10 +80,10 @@ class PPO:
         log_prob = distribution.log_prob(action)
 
         if self.test:
-            return action.detach().numpy(), 1
+            return action.detach().cpu().numpy(), 1
 
         #detach because they are tensors
-        return action.detach().numpy(), log_prob.detach()
+        return action.detach().cpu().numpy(), log_prob.detach().cpu()
 
 
     def compute_future_rewards(self, rewards_batch):
@@ -258,6 +261,7 @@ class PPO:
         current_iterations = 0
         timesteps_since_save = 0
         best_reward = -np.inf
+        self.max_timesteps = max_timesteps
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
@@ -346,6 +350,8 @@ class PPO:
 
             self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
             self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
+
+            print('current iteration: ', current_iterations)
 
             if current_iterations % self.eval_ratio == 0:
                 self.launch_eval()

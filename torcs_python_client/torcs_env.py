@@ -32,7 +32,6 @@ class TorcsEnv:
         observation_highs = np.array(2*self.single_obs_highs, dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
-        self.client = snakeoil.Client(p=3001) if create_client else None
         self.time_step = 0
         self.max_speed = 300.
         self.previous_state = None
@@ -49,6 +48,7 @@ class TorcsEnv:
         # self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
     
         self.last_lap_time = 0
+        self.client = snakeoil.Client(p=3001) if create_client else None
 
 
     def load_training_data(self):
@@ -159,7 +159,7 @@ class TorcsEnv:
         speed_y = state['speedY']/self.max_speed
         angle = state['angle']/PI
         speed_dif = abs(speed_x - prev_speed)
-        speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - speed_y*np.cos(angle)
+        speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
         
         # get angle of first frame of stack
         prev_angle = self.frame_stacking[0][0]
