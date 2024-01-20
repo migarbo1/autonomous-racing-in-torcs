@@ -28,8 +28,8 @@ class TorcsEnv:
         # Observation order:[Angle, speedX, speedY, speedZ, track(19), trackPos]  
         self.single_obs_lows = [-PI, -2**62, -2**62, -2**62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2**62]
         self.single_obs_highs = [PI, 2**62, 2**62, 2**62, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 2**62]
-        observation_lows = np.array(2*self.single_obs_lows, dtype='float')
-        observation_highs = np.array(2*self.single_obs_highs, dtype='float')
+        observation_lows = np.array(num_frames*self.single_obs_lows, dtype='float')
+        observation_highs = np.array(num_frames*self.single_obs_highs, dtype='float')
         self.observation_space = spaces.Box(low=observation_lows, high=observation_highs)
 
         self.time_step = 0
@@ -137,13 +137,14 @@ class TorcsEnv:
 
 
     def get_complete_obs(self):
-        res = []
+        # res = []
 
-        for i in range(len(self.frame_stacking[-1])):
-            res.append(self.frame_stacking[-1][i])
-            res.append(self.frame_stacking[-1][i] - self.frame_stacking[0][i])
+        # for i in range(len(self.frame_stacking[-1])):
+        #     res.append(self.frame_stacking[-1][i])
+        #     res.append(self.frame_stacking[-1][i] - self.frame_stacking[0][i])
         
-        return res
+        # return res
+        return np.array(self.frame_stacking).flatten()
 
 
     def append_state_to_stack(self, state):

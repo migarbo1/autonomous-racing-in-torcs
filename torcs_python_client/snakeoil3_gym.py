@@ -91,7 +91,7 @@ def restart_torcs(eval = False):
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')
     time.sleep(0.5)
-    if TEXTMODE and not eval: 
+    if TEXTMODE:# and not eval: 
         os.system(f'torcs -nofuel -r {os.getcwd()}/configs/{mode}.xml &') # -noisy 
     else:
         mode = 'practice' if eval and TEXTMODE else mode

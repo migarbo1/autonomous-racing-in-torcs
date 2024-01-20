@@ -26,7 +26,8 @@
   <section name="Tracks">
     <attnum name="maximum number" val="1"/>
     <section name="1">
-      <attstr name="name" val="eroad"/>
+      <!-- <attstr name="name" val="brondehach"/> -->
+      <attstr name="name" val="brondehach"/>
       <attstr name="category" val="road"/>
     </section>
 
@@ -44,7 +45,7 @@
     <attstr name="type" val="race"/>
     <attstr name="starting order" val="drivers list"/>
     <attstr name="restart" val="yes"/>
-    <attnum name="laps" val="3"/>
+    <attnum name="laps" val="50"/>
     <section name="Starting Grid">
       <attnum name="rows" val="2"/>
       <attnum name="distance to start" val="25"/>

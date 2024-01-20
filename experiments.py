@@ -4,15 +4,17 @@ from ppo.ppo import PPO
 from pathlib import Path
 import numpy as np
 import torch
+import time
 import os
 
 def change_track(track, prev_track):
-    with open(Path.home() / '.torcs/config/raceman/quickrace.xml', 'r') as file:
+    config_path = Path.home() / '.torcs/config/raceman' if not snakeoil.TEXTMODE else 'configs'
+    with open(f'{config_path}/quickrace.xml', 'r') as file:
         content = file.read()
 
-    open(Path.home() / '.torcs/config/raceman/quickrace.xml', 'w').close() #reset file contents
+    open(f'{config_path}/quickrace.xml', 'w').close() #reset file contents
 
-    with open(Path.home() / '.torcs/config/raceman/quickrace.xml', 'w') as file:
+    with open(f'{config_path}/quickrace.xml', 'w') as file:
         content = content.replace(f'<attstr name="name" val="{prev_track}"/>', f'<attstr name="name" val="{track}"/>')
         file.write(content)
 
@@ -31,22 +33,24 @@ def write_results(results):
 
 if __name__ == '__main__':
     torch.set_default_device('cuda')
-    snakeoil.set_textmode(False)
+    # snakeoil.set_textmode(False)
     snakeoil.set_tracks(track_list=['quickrace'])
     tracks = ['brondehach','g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-1', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3']
     results= {}
     prev_track = tracks[0]
     for track in tracks:
         change_track(track, prev_track)
+        print('current track: ', track)
         rollout_distances = []
         rollout_rewards = []
         avg_speeds = []
         max_speeds = []
         for i in range(5):
             try:
+                time.sleep(0.5)
                 env = TorcsEnv()
                 model = PPO(env, test=True)
-                model.eval_max_timesteps = 500000
+                model.eval_max_timesteps = 50000
                 model.launch_eval()
                 env.kill_torcs()
                 rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])
