@@ -42,10 +42,10 @@ class TorcsEnv:
 
         self.training_data = self.load_training_data()
 
-        self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
+        # self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
         # self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
         # self.vision_angles = [-45, -32, -24, -12, -8, -6, -4, -2, -1, 0, 1, 2, 4, 6, 8, 12, 24, 32, 45]
-        # self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
+        self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
     
         self.last_lap_time = 0
         self.client = snakeoil.Client(p=3001) if create_client else None
