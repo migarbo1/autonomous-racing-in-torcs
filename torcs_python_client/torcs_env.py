@@ -195,6 +195,12 @@ class TorcsEnv:
             gear = 6
         if speed > 295:
             gear = 7
+        #if speed > 80:
+        #    gear = 2
+        #if speed > 110:
+        #    gear = 3
+        #if speed > 140:
+        #    gear = 4
         return gear
 
 

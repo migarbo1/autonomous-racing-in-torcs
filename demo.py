@@ -6,6 +6,7 @@ import torch
 
 
 if __name__ == '__main__':
+    torch.set_default_device('cuda')
     snakeoil.set_textmode(False)
     train_tracks = snakeoil.TRACKS.copy() + ['practice']
     for track in train_tracks:
