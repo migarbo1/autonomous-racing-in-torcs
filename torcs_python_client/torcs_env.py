@@ -195,6 +195,7 @@ class TorcsEnv:
             gear = 6
         if speed > 295:
             gear = 7
+        # Gear computing for P406
         # if speed > 55:
         #     gear = 2
         # if speed > 90:
