@@ -86,7 +86,7 @@ TRACKS = ['quickrace', 'ncrace', 'endrace'] # alpine 1, wheel 2, E-track 6
 def restart_torcs(eval = False):
     global TEXTMODE, TRACKS
     print(TRACKS)
-    mode = random.sample(TRACKS ,1)[0] 
+    mode = random.sample(TRACKS ,1)[0] if not eval else 'practice'
     print(mode)
     logging.log(0, 'Killing torcs and re-launching...')
     os.system(f'pkill torcs')

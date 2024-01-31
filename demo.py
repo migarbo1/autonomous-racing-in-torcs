@@ -6,6 +6,7 @@ import torch
 
 
 if __name__ == '__main__':
+    torch.set_default_device('cuda')
     snakeoil.set_textmode(False)
     train_tracks = snakeoil.TRACKS.copy() + ['practice']
     for track in train_tracks:
@@ -14,7 +15,7 @@ if __name__ == '__main__':
         env = TorcsEnv()
         model = PPO(env, test=True)
         model.eval_max_timesteps = 500000
-        for i in range(5):
+        for i in range(3):
             model.launch_eval()
             rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])
         print(np.mean(rollout_distances))

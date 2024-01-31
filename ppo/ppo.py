@@ -76,6 +76,10 @@ class PPO:
         # Sample an action from the distribution and get its log prob
         action = distribution.sample()
 
+        # stochastic breaking
+        # if state[1 + 24*(self.env.num_frames-1)] > 90 and random.random() < 0.1:
+        #     action[0] = -1
+
         print('Selected actions: ', action)
         log_prob = distribution.log_prob(action)
 
