@@ -189,8 +189,8 @@ class Client():
             # This string establishes track sensor angles! You can customize them.
             # a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"       # Initial test
             # a= "-45 -19 -12 -7 -4 -2.5 -1.7 -1 -.5 0 .5 1 1.7 2.5 4 7 12 19 45"       # TODO: these are the angles used by all the comunity 
-            a= "-45 -32 -23 -11 -7 -4 -2.8 -1.5 -.5 0 .5 1.5 2.8 4 7 11 23 32 45"     # TODO: seccond test
-
+            a= "-45 -32 -23 -11 -7 -4 -2.8 -1.5 -.5 0 .5 1.5 2.8 4 7 11 23 32 45"     
+            
             initmsg='%s(init %s)' % (self.sid,a)
 
             try:

@@ -77,8 +77,11 @@ class PPO:
         action = distribution.sample()
 
         # stochastic breaking
-        # if state[1 + 24*(self.env.num_frames-1)] > 90 and random.random() < 0.1:
-        #     action[0] = -1
+        if not self.test:
+            rate = (self.current_timesteps*2)/self.max_timesteps if self.current_timesteps < self.max_timesteps/2 else 1-self.current_timesteps/self.max_timesteps
+            if random.random() < 0.1 * rate:
+                print('exploration: ', rate*0.1)
+                action[0] = -1
 
         print('Selected actions: ', action)
         log_prob = distribution.log_prob(action)
@@ -119,6 +122,7 @@ class PPO:
 
         done = False
         state, _ = self.env.reset(eval=True)
+        self.test = True
         while not done and i < self.eval_max_timesteps:
             action, log_prob = self.get_action(state)
             state, reward, done, _ ,_ = self.env.step(action)
@@ -149,6 +153,7 @@ class PPO:
         eval_results['all_steps_completed'] = i==self.eval_max_timesteps
 
         self.env.training_data['eval_results'].append(eval_results)
+        self.test = False
 
 
     def rollout(self):

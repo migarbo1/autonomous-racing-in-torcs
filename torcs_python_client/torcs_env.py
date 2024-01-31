@@ -45,7 +45,7 @@ class TorcsEnv:
         # self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
         # self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
         # self.vision_angles = [-45, -32, -24, -12, -8, -6, -4, -2, -1, 0, 1, 2, 4, 6, 8, 12, 24, 32, 45]
-        self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
+        # self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
     
         self.last_lap_time = 0
         self.client = snakeoil.Client(p=3001) if create_client else None
@@ -69,12 +69,12 @@ class TorcsEnv:
         done = False
 
         if isinstance(actions, np.ndarray):
-            actions = self.action_array2dict(actions)
+            action_dict = self.action_array2dict(actions)
 
         # print('Parsed actions:', actions)
 
         # set action dict to the selected actions by network
-        for k, v in actions.items():
+        for k, v in action_dict.items():
             self.client.R.d[k] = v
         
         # set automatic gear
@@ -155,46 +155,47 @@ class TorcsEnv:
 
     def compute_reward(self, state):
         # get speed of first frame of stack
-        prev_speed = self.frame_stacking[0][1]
-        speed_x = state['speedX']/self.max_speed
-        speed_y = state['speedY']/self.max_speed
-        angle = state['angle']/PI
-        speed_dif = abs(speed_x - prev_speed)
-        speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
+        prev_speed = self.frame_stacking[0][1]*self.max_speed
+        speed_x = state['speedX']
+        speed_y = state['speedY']
+        angle = state['angle']
+        speed_dif = abs(speed_x - prev_speed)*np.cos(angle)
+        location = speed_x/2 * abs(state['trackPos'])
+        lateral_force = abs(speed_y)*np.cos(angle)
+        speed_reward = speed_x * (np.cos(angle) - np.sin(abs(angle)))
         
         # get angle of first frame of stack
-        prev_angle = self.frame_stacking[0][0]
-        angle_variation = 5*abs(angle - prev_angle) # TODO: el problema del waving puede ser que mira el t-5 y no el numero de veces que cambia el angulo entre t-5 y t
+        prev_angle = self.frame_stacking[0][0]*PI
 
-
-        reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
+        reward = 2*speed_dif + speed_reward - lateral_force - location#- abs(state['trackPos']) #- angle_norm
             # + forward_view
 
         if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
-            reward = reward + 100
+            reward = reward + 10000
             self.last_lap_time = state['lastLapTime']
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
-        print(f'sp_reward: {speed_reward:4f}; delta_sp: {speed_dif:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
+        print(f'sp_reward: {speed_reward:4f}; delta_sp: {2*speed_dif:4f}; lt_force: {lateral_force:4f}; loc: {location:4f}; Reward: {reward:4f}')
 
         return reward
 
 
     def compute_gear(self, speed):
         gear = 1
-        if speed > 120:
+        if speed > 110:
             gear = 2
-        if speed > 140:
+        if speed > 130:
             gear = 3
-        if speed > 190:
+        if speed > 180:
             gear = 4
-        if speed > 240:
+        if speed > 230:
             gear = 5
-        if speed > 270:
+        if speed > 260:
             gear = 6
-        if speed > 295:
+        if speed > 285:
             gear = 7
+        # Gear computing for P406
         # if speed > 55:
         #     gear = 2
         # if speed > 90:

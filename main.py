@@ -12,7 +12,7 @@ if __name__ == '__main__':
     torch.set_default_device('cuda')
     env = TorcsEnv()
     #TODO: make console parameter
-    timesteps = 6000000
+    timesteps = 8000000
     model = PPO(env)
     try:
         model.learn(timesteps)
