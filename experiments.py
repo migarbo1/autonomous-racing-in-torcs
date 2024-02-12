@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import time
+import math
 import os
 
 def change_track(track, prev_track):
@@ -33,7 +34,7 @@ def write_results(results):
 
 if __name__ == '__main__':
     torch.set_default_device('cuda')
-    #snakeoil.set_textmode(False)
+    # snakeoil.set_textmode(False)
     snakeoil.set_tracks(track_list=['quickrace'])
     tracks = ['brondehach','g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3'] #  'e-track-1',
     results= {}
@@ -45,13 +46,12 @@ if __name__ == '__main__':
         rollout_rewards = []
         avg_speeds = []
         max_speeds = []
-        for i in range(5):
+        for i in range(10):
             try:
-                time.sleep(0.5)
                 env = TorcsEnv()
                 model = PPO(env, test=True)
                 model.eval_max_timesteps = 50000
-                model.launch_eval()
+                model.launch_eval(only_practice=False)
                 env.kill_torcs()
                 rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])
                 
@@ -63,6 +63,7 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
         prev_track = track
-        results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances):4f}, avg_rollout_dist: {np.mean(rollout_distances):4f}, min_rollout_dist: {np.min(rollout_distances):4f}, max_score: {np.max(rollout_rewards):4f}, avg_score: {np.mean(rollout_rewards):4f}, avg_max_speed: {np.mean(max_speeds):4f}, avg_avg_speed: {np.mean(avg_speeds):4f}' + '}'
+        rollout_conf_int = 1.95 * (np.std(rollout_distances)/math.sqrt(len(rollout_distances)))
+        results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances):4f}, avg_rollout_dist: {np.mean(rollout_distances):4f}, min_rollout_dist: {np.min(rollout_distances):4f}, rollout_conf_int: {rollout_conf_int:4f}, max_score: {np.max(rollout_rewards):4f}, avg_score: {np.mean(rollout_rewards):4f}, avg_max_speed: {np.mean(max_speeds):4f}, avg_avg_speed: {np.mean(avg_speeds):4f}' + '}'
     write_results(results)
     change_track('brondehach', tracks[-1])
