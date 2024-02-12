@@ -98,7 +98,7 @@ class PPO:
         return future_rewards_batch
 
 
-    def launch_eval(self):
+    def launch_eval(self, only_practice=True):
         eval_results = {}
 
         i = 0
@@ -111,7 +111,7 @@ class PPO:
         last_lap_time = 0 
 
         done = False
-        state, _ = self.env.reset(eval=True)
+        state, _ = self.env.reset(eval=only_practice)
         while not done and i < self.eval_max_timesteps:
             action, log_prob = self.get_action(state)
             state, reward, done, _ ,_ = self.env.step(action)
