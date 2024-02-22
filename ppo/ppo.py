@@ -1,6 +1,6 @@
 import time
 from torch.distributions import MultivariateNormal
-from .network import FeedForwardNN
+from .network import Actor, Critic
 from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
@@ -20,8 +20,8 @@ class PPO:
         self.act_dim = env.action_space.shape[0]
 
         # Initialize actor and critic networks
-        self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN(self.obs_dim, 1)
+        self.actor = Actor(self.obs_dim, self.act_dim, training=test)
+        self.critic = Critic(self.obs_dim, 1, training=test)
         self.actor.to('cuda')
         self.critic.to('cuda')
         if os.path.isfile('./weights/ppo_actor.pth'):
@@ -51,7 +51,7 @@ class PPO:
         self.lr = 0.005
         self.save_ratio = 3
 
-        self.eval_ratio = 5
+        self.eval_ratio = 3
         self.eval_max_timesteps = 10000
 
         # advanced hyper parameters 
@@ -77,8 +77,11 @@ class PPO:
         action = distribution.sample()
 
         # stochastic breaking
-        # if state[1 + 24*(self.env.num_frames-1)] > 90 and random.random() < 0.1:
-        #     action[0] = -1
+        # if not self.test:
+        #     rate = (self.current_timesteps*2)/self.max_timesteps if self.current_timesteps < self.max_timesteps/2 else 1-self.current_timesteps/self.max_timesteps
+        #     if random.random() < 0.1 * rate:
+        #         print('exploration: ', rate*0.1)
+        #         action[0] = -1
 
         print('Selected actions: ', action)
         log_prob = distribution.log_prob(action)
@@ -118,6 +121,7 @@ class PPO:
         last_lap_time = 0 
 
         done = False
+        self.test = True
         state, _ = self.env.reset(eval=only_practice)
         while not done and i < self.eval_max_timesteps:
             action, log_prob = self.get_action(state)
@@ -149,6 +153,7 @@ class PPO:
         eval_results['all_steps_completed'] = i==self.eval_max_timesteps
 
         self.env.training_data['eval_results'].append(eval_results)
+        self.test = False
 
 
     def rollout(self):
@@ -169,7 +174,7 @@ class PPO:
 
             state, _ = self.env.reset()
             done = False
-            
+
             for _ in range(self.max_timesteps_per_episode):
 
                 ep_dones.append(done)
