@@ -5,6 +5,7 @@ from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
 import random
+import pickle
 import torch
 import os
 
@@ -30,6 +31,10 @@ class PPO:
         if os.path.isfile('./weights/ppo_critic.pth'):
             print('loading critic weights ....')
             self.critic.load_state_dict(torch.load('./weights/ppo_critic.pth'))
+        if os.path.isfile(f'{os.getcwd()}/human_data_formatted.pickle'):
+            print('loading human data...')
+            with open(f'{os.getcwd()}/human_data_formatted.pickle', 'rb') as file:
+                self.human_data = pickle.load(file)
 
         self.variance = variance if not test else 0.05
         self.curr_variance = variance if not test else 0.05
@@ -60,6 +65,8 @@ class PPO:
         self.max_grad_norm = 0.5
         self.target_kl = 0.02 
         self.lamda = 0.98
+
+        self.human_steps = 800
 
 
     def get_action(self, state):
@@ -265,6 +272,43 @@ class PPO:
         return torch.tensor(advantage_batch, dtype=torch.float)
 
 
+    def add_human_data(self, obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch):
+        selected_human_data = random.sample(self.human_data, 1)[0]
+
+        hd_obs = selected_human_data[0]
+        hd_reward = selected_human_data[1]
+        hd_actions = selected_human_data[2]
+        hd_done = selected_human_data[3]
+
+        idx = random.randint(0, len(hd_obs) - self.human_steps) - 1
+        
+        complete_obs_batch = torch.cat((obs_batch, torch.tensor(hd_obs[idx:idx+self.human_steps], dtype=torch.float)))
+        complete_act_batch = torch.cat((act_batch, torch.tensor(hd_actions[idx:idx+self.human_steps], dtype=torch.float)))
+        
+        #tecnicament es com si sols tingueres un episodi i el ficares en la llista de episodis
+        complete_done_batch = dones_batch + [hd_done[idx:idx+self.human_steps]]
+        complete_rew_batch =  rewards_batch + [hd_reward[idx:idx+self.human_steps]]
+
+        hd_logprobs = []
+        hd_vals = []
+
+        cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
+        cov_mat = torch.diag(cov_var)
+        
+        for i in range(idx, idx+self.human_steps):
+            action = torch.tensor(hd_actions[i], dtype=torch.float)
+            distribution = MultivariateNormal(action, cov_mat)
+            hd_logprobs.append(distribution.log_prob(action).detach().cpu())
+            
+            state = hd_obs[i]
+            hd_vals.append(self.critic(state).flatten())
+
+        complete_logprob_batch = torch.cat((logprob_batch, torch.tensor(hd_logprobs, dtype=torch.float).flatten()))
+        complete_val_batch = val_batch + [hd_vals]
+
+        return complete_obs_batch, complete_act_batch, complete_logprob_batch, complete_rew_batch, complete_val_batch, complete_done_batch
+        
+
     def learn(self, max_timesteps):
         self.current_timesteps = 0
         current_iterations = 0
@@ -273,6 +317,8 @@ class PPO:
         self.max_timesteps = max_timesteps
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
+
+            obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE
             advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)
