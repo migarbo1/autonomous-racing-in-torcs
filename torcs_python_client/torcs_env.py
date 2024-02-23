@@ -183,17 +183,17 @@ class TorcsEnv:
 
     def compute_gear(self, speed):
         gear = 1
-        if speed > 120:
+        if speed > 110:
             gear = 2
-        if speed > 140:
+        if speed > 130:
             gear = 3
-        if speed > 190:
+        if speed > 180:
             gear = 4
-        if speed > 240:
+        if speed > 230:
             gear = 5
-        if speed > 270:
+        if speed > 260:
             gear = 6
-        if speed > 295:
+        if speed > 285:
             gear = 7
         # Gear computing for P406
         # if speed > 55:
