@@ -46,7 +46,7 @@ if __name__ == '__main__':
         rollout_rewards = []
         avg_speeds = []
         max_speeds = []
-        for i in range(10):
+        for i in range(11):
             try:
                 env = TorcsEnv()
                 model = PPO(env, test=True)
@@ -63,6 +63,8 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
         prev_track = track
+        rollout_rewards.sort()
+        rollout_distances = rollout_distances[1:]
         rollout_conf_int = 1.95 * (np.std(rollout_distances)/math.sqrt(len(rollout_distances)))
         results[track] = '{' + f'max_rollout_dist: {np.max(rollout_distances):4f}, avg_rollout_dist: {np.mean(rollout_distances):4f}, min_rollout_dist: {np.min(rollout_distances):4f}, rollout_conf_int: {rollout_conf_int:4f}, max_score: {np.max(rollout_rewards):4f}, avg_score: {np.mean(rollout_rewards):4f}, avg_max_speed: {np.mean(max_speeds):4f}, avg_avg_speed: {np.mean(avg_speeds):4f}' + '}'
     write_results(results)
