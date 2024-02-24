@@ -37,7 +37,7 @@ mv results.txt results/results_fs_3.txt
 echo 'launching eval for baseline'
 mv weights/ppo_actor_baseline.pth weights/ppo_actor.pth
 mv weights/ppo_critic_baseline.pth weights/ppo_critic.pth
-python experiments.py 3
+python experiments.py 1
 mv weights/ppo_actor.pth weights/ppo_actor_baseline.pth
 mv weights/ppo_critic.pth weights/ppo_critic_baseline.pth
 mv results.txt results/results_baseline.txt
