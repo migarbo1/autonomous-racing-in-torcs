@@ -14,7 +14,7 @@ def load_training_data(name):
         return {"total_training_timesteps": 0.0, "actor_episodic_avg_loss": [], "critic_episodic_avg_loss": [], "eval_results": []}
 
 # plot comparativo rewards por episodio
-# tr1 = load_training_data('training_data')
+# tr1 = load_training_data('training_data_baseline')
 # tr3 = load_training_data('training_data_fs_3')
 # tr5 = load_training_data('training_data_fs_5')
 
@@ -22,23 +22,23 @@ def load_training_data(name):
 # rewards_tr3 = [a['rewards_per_timestep'] for a in tr3['eval_results']]
 # rewards_tr5 = [a['rewards_per_timestep'] for a in tr5['eval_results']]
 
-# rewards_tr1 = [sum(a[:-1]) for a in rewards_tr1]
-# rewards_tr3 = [sum(a[:-1]) for a in rewards_tr3]
-# rewards_tr5 = [sum(a[:-1]) for a in rewards_tr5]
+# rewards_tr1 = [sum(a[:]) for a in rewards_tr1]
+# rewards_tr3 = [sum(a[:]) for a in rewards_tr3]
+# rewards_tr5 = [sum(a[:]) for a in rewards_tr5]
 
 # plt.title('Reward earned in eval track')
 # plt.xlabel('Episode')
 # plt.ylabel('Reward')
-# # plt.plot([a for a in range(len(rewards_tr1))],rewards_tr1, '--', label='baseline')
-# plt.plot([a for a in range(len(rewards_tr3))],rewards_tr3, '-',label='3 frames')
-# plt.plot([a for a in range(len(rewards_tr5))],rewards_tr5, '-.',label='5 frames')
+# plt.plot([a for a in range(len(rewards_tr1))],rewards_tr1, '--', label='baseline')
+# plt.plot([a for a in range(len(rewards_tr5)-2)],rewards_tr5[:-2], '-',label='5 frames')
+# plt.plot([a for a in range(len(rewards_tr3))],rewards_tr3, '-.',label='3 frames')
 # plt.legend()
 # plt.show()
 
 
 #plot comparativo loss actor entre modelos fs
 
-# tr1 = load_training_data('training_data')
+# tr1 = load_training_data('training_data_baseline')
 # tr3 = load_training_data('training_data_fs_3')
 # tr5 = load_training_data('training_data_fs_5')
 # plt.title('Actor episodic average loss')

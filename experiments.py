@@ -38,6 +38,7 @@ if __name__ == '__main__':
     # snakeoil.set_textmode(False)
     snakeoil.set_tracks(track_list=['quickrace'])
     num_frames = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    use_human_data = bool(sys.argv[2]) if len(sys.argv)>2 else False
     tracks = ['brondehach','g-track-1', 'forza', 'g-track-2', 'g-track-3', 'ole-road-1', 'ruudskogen', 'street-1', 'wheel-1', 'wheel-2', 'aalborg', 'alpine-1', 'alpine-2', 'e-track-2', 'e-track-4', 'e-track-6', 'eroad', 'e-track-3', 'corkscrew'] #  'e-track-1',
     results= {}
     prev_track = tracks[0]
@@ -51,7 +52,7 @@ if __name__ == '__main__':
         for i in range(11):
             try:
                 env = TorcsEnv(num_frames = num_frames)
-                model = PPO(env, test=True)
+                model = PPO(env, test=True, use_human_data=use_human_data)
                 model.eval_max_timesteps = 50000
                 model.launch_eval(only_practice=False)
                 env.kill_torcs()
