@@ -13,7 +13,7 @@ if __name__ == '__main__':
     torch.set_default_device('cuda')
     
     num_frames = int(sys.argv[1]) if len(sys.argv) > 1 else 5
-    use_human_data = bool(sys.argv[2]) if len(sys.argv)> 2 else False
+    use_human_data = bool(sys.argv[2] == 'True') if len(sys.argv)>2 else False
     env = TorcsEnv(num_frames = num_frames)
     #TODO: make console parameter
     timesteps = 6000000

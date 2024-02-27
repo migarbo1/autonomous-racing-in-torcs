@@ -11,7 +11,7 @@ import os
 
 
 class PPO:
-    def __init__(self, env, variance=0.35, test = False) -> None:
+    def __init__(self, env, variance=0.35, test = False, use_human_data = False) -> None:
         # Set hyperparameters
         self._init_hyperparameters()
         
@@ -19,6 +19,9 @@ class PPO:
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
         self.act_dim = env.action_space.shape[0]
+
+        self.use_human_data = use_human_data
+        print(self.use_human_data)
 
         # Initialize actor and critic networks
         self.actor = Actor(self.obs_dim, self.act_dim, training=test)
@@ -31,9 +34,9 @@ class PPO:
         if os.path.isfile('./weights/ppo_critic.pth'):
             print('loading critic weights ....')
             self.critic.load_state_dict(torch.load('./weights/ppo_critic.pth'))
-        if os.path.isfile(f'{os.getcwd()}/human_data_formatted.pickle'):
+        if self.use_human_data and os.path.isfile(f'{os.getcwd()}/human_data/formatted.pickle'):
             print('loading human data...')
-            with open(f'{os.getcwd()}/human_data_formatted.pickle', 'rb') as file:
+            with open(f'{os.getcwd()}/human_data/formatted.pickle', 'rb') as file:
                 self.human_data = pickle.load(file)
 
         self.variance = variance if not test else 0.05
@@ -318,7 +321,8 @@ class PPO:
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
-            obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
+            if self.use_human_data:
+                obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE
             advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)

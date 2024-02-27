@@ -196,14 +196,25 @@ class TorcsEnv:
         if speed > 285:
             gear = 7
         # Gear computing for P406
-        # if speed > 55:
+        # if speed > 50:
         #     gear = 2
         # if speed > 90:
         #     gear = 3
-        # if speed > 130:
+        # if speed > 125:
         #     gear = 4
-        # if speed > 165:
+        # if speed > 160:
         #     gear = 5
+        # Gear computing for trb1
+        # if speed > 75:
+        #     gear = 2
+        # if speed > 120:
+        #     gear = 3
+        # if speed > 160:
+        #     gear = 4
+        # if speed > 210:
+        #     gear = 5
+        # if speed > 250:
+        #     gear = 6
         return gear
 
 

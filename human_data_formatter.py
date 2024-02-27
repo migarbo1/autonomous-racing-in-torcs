@@ -13,7 +13,7 @@ def load_training_data(name):
 
 formatted_human_data = []
 
-for n in ['aalborg', 'suzuka', 'brondehach', 'corkscrew']:
+for n in ['record']:#['aalborg', 'suzuka', 'brondehach', 'corkscrew']:
     tr = load_training_data(n)
 
     obs = tr[0]

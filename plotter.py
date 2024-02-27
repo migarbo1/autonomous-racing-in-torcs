@@ -35,6 +35,23 @@ def load_training_data(name):
 # plt.legend()
 # plt.show()
 
+# plot comparativo rollout por episodio
+# tr1 = load_training_data('training_data_baseline')
+# tr3 = load_training_data('training_data_fs_3')
+# tr5 = load_training_data('training_data_fs_5')
+
+# rewards_tr1 = [a['dist_raced'] for a in tr1['eval_results']]
+# rewards_tr3 = [a['dist_raced'] for a in tr3['eval_results']]
+# rewards_tr5 = [a['dist_raced'] for a in tr5['eval_results']]
+
+# plt.title('Distance covered in eval track')
+# plt.xlabel('Episode')
+# plt.ylabel('Reward')
+# plt.plot([a for a in range(len(rewards_tr1)-4)],rewards_tr1[:-4], '--', label='baseline')
+# plt.plot([a for a in range(len(rewards_tr5)-2)],rewards_tr5[:-2], '-',label='5 frames')
+# plt.plot([a for a in range(len(rewards_tr3))],rewards_tr3, '-.',label='3 frames')
+# plt.legend()
+# plt.show()
 
 #plot comparativo loss actor entre modelos fs
 
