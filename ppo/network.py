@@ -5,7 +5,7 @@ import torch
 
 
 class Actor(nn.Module):
-    def __init__(self, in_dim, out_dim, drop_rate = 0.1, training = True):
+    def __init__(self, in_dim, out_dim, drop_rate = 0.1, test = False):
         super(Actor, self).__init__()
 
         self.input_layer = nn.Linear(in_dim, 512)
@@ -13,7 +13,7 @@ class Actor(nn.Module):
         self.hidden_layer2 = nn.Linear(256, 128)
         self.output_layer = nn.Linear(128, out_dim)
 
-        self.training = training
+        self.test = test
 
         self.drop1 = nn.Dropout(p=drop_rate)
         self.drop2 = nn.Dropout(p=drop_rate)
@@ -27,13 +27,13 @@ class Actor(nn.Module):
             observation_tensor = observation
 
         act1 = F.relu(self.input_layer(observation_tensor))
-        act1 = self.drop1(act1) if self.training else act1
+        act1 = self.drop1(act1) if not self.test else act1
         
         act2 = F.relu(self.hidden_layer1(act1))
-        act2 = self.drop2(act2) if self.training else act2
+        act2 = self.drop2(act2) if not self.test else act2
 
         act3 = F.relu(self.hidden_layer2(act2))
-        act3 = self.drop3(act3) if self.training else act3
+        act3 = self.drop3(act3) if not self.test else act3
         
         out = self.output_layer(act3)
 
@@ -42,7 +42,7 @@ class Actor(nn.Module):
         return out
 
 class Critic(nn.Module):
-    def __init__(self, in_dim, out_dim, drop_rate = 0.1, training = True):
+    def __init__(self, in_dim, out_dim, drop_rate = 0.1, test = True):
         super(Critic, self).__init__()
 
         self.input_layer = nn.Linear(in_dim, 512)
@@ -50,7 +50,7 @@ class Critic(nn.Module):
         self.hidden_layer2 = nn.Linear(256, 128)
         self.output_layer = nn.Linear(128, out_dim)
 
-        self.training = training
+        self.test = test
 
         self.drop1 = nn.Dropout(p=drop_rate)
         self.drop2 = nn.Dropout(p=drop_rate)
@@ -64,13 +64,13 @@ class Critic(nn.Module):
             observation_tensor = observation
 
         act1 = F.relu(self.input_layer(observation_tensor))
-        act1 = self.drop1(act1) if self.training else act1
+        act1 = self.drop1(act1) if not self.test else act1
         
         act2 = F.relu(self.hidden_layer1(act1))
-        act2 = self.drop2(act2) if self.training else act2
+        act2 = self.drop2(act2) if not self.test else act2
 
         act3 = F.relu(self.hidden_layer2(act2))
-        act3 = self.drop3(act3) if self.training else act3
+        act3 = self.drop3(act3) if not self.test else act3
         
         out = self.output_layer(act3)
 

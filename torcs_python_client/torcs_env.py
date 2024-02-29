@@ -176,7 +176,7 @@ class TorcsEnv:
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
-        print(f'sp_reward: {speed_reward:4f}; delta_sp: {speed_dif:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
+        # print(f'sp_reward: {speed_reward:4f}; delta_sp: {speed_dif:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
 
         return reward
 

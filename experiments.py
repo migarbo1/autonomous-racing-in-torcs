@@ -49,10 +49,11 @@ if __name__ == '__main__':
         avg_speeds = []
         max_speeds = []
         for i in range(11):
+            print(f'rollout {i+1} of {11}')
+            env = TorcsEnv(num_frames = num_frames)
+            model = PPO(env, test=True)
+            model.eval_max_timesteps = 50000
             try:
-                env = TorcsEnv(num_frames = num_frames)
-                model = PPO(env, test=True)
-                model.eval_max_timesteps = 50000
                 model.launch_eval(only_practice=False)
                 env.kill_torcs()
                 rollout_distances.append(model.env.training_data['eval_results'][-1]['dist_raced'])

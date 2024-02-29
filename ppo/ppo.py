@@ -21,11 +21,10 @@ class PPO:
         self.act_dim = env.action_space.shape[0]
 
         self.use_human_data = use_human_data
-        print(self.use_human_data)
 
         # Initialize actor and critic networks
-        self.actor = Actor(self.obs_dim, self.act_dim, training=test)
-        self.critic = Critic(self.obs_dim, 1, training=test)
+        self.actor = Actor(self.obs_dim, self.act_dim, test=test)
+        self.critic = Critic(self.obs_dim, 1, test=test)
         self.actor.to('cuda')
         self.critic.to('cuda')
         if os.path.isfile('./weights/ppo_actor.pth'):
@@ -60,7 +59,7 @@ class PPO:
         self.save_ratio = 3
 
         self.eval_ratio = 3
-        self.eval_max_timesteps = 10000
+        self.eval_max_timesteps = 15000
 
         # advanced hyper parameters 
         self.num_minibatches = 6
@@ -74,8 +73,6 @@ class PPO:
 
     def get_action(self, state):
         mean = self.actor(state)
-
-        # print('Action means: ', mean)
         
         # create the covariance matrix for continuous multi action space
         cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
@@ -93,12 +90,10 @@ class PPO:
         #         print('exploration: ', rate*0.1)
         #         action[0] = -1
 
-        print('Selected actions: ', action)
-        log_prob = distribution.log_prob(action)
-
         if self.test:
             return action.detach().cpu().numpy(), 1
 
+        log_prob = distribution.log_prob(action)
         #detach because they are tensors
         return action.detach().cpu().numpy(), log_prob.detach().cpu()
 
@@ -141,6 +136,9 @@ class PPO:
             reward_list.append(reward)
             obs_list.append(self.env.previous_state) #store previous_state so we have all the information. At this time prev_state = obs_after_action
 
+            if reward < -10 and done:
+                print('\nepisode terminated by a collision')
+
             curr_speed = self.env.previous_state['speedX']
             speed_list.append(curr_speed)
             if curr_speed > max_speed:
@@ -152,6 +150,8 @@ class PPO:
                 laps_completed += 1
 
             i+=1
+        if i==self.eval_max_timesteps:
+            print('max eval timesteps  reached, stopping rollout...')
 
         eval_results['max_speed'] = max_speed
         eval_results['avg_speed'] = np.mean(speed_list)

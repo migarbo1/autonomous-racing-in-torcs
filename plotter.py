@@ -66,3 +66,41 @@ def load_training_data(name):
 # plt.plot(tr5['actor_episodic_avg_loss'], label='fs_5')
 # plt.legend()
 # plt.show()
+
+
+tr1 = load_training_data('training_data_baseline')
+tr3 = load_training_data('training_data_HK_best')
+
+plt.title('Critic episodic average loss')
+plt.xlabel('Episode')
+plt.ylabel('Actor loss')
+plt.yscale('log')
+plt.plot(tr1['critic_episodic_avg_loss'], label='baseline')
+plt.plot(tr3['critic_episodic_avg_loss'], label='BC-Driver')
+plt.legend()
+plt.show()
+
+# rewards_tr1 = [a['rewards_per_timestep'] for a in tr1['eval_results']]
+# rewards_tr3 = [a['rewards_per_timestep'] for a in tr3['eval_results']]
+
+# rewards_tr1 = [sum(a[:-1]) for a in rewards_tr1]
+# rewards_tr3 = [sum(a[:-1]) for a in rewards_tr3]
+
+# plt.title('Reward earned in eval track')
+# plt.xlabel('Episode')
+# plt.ylabel('Reward')
+# plt.plot([a*3 for a in range(24)],rewards_tr1[:24], '--', label='baseline')
+# plt.plot([a*3 for a in range(24)],rewards_tr3[:24], '-.',label='BC-Driver')
+# plt.legend()
+# plt.show()
+
+# rewards_tr1 = [a['dist_raced'] for a in tr1['eval_results']]
+# rewards_tr3 = [a['dist_raced'] for a in tr3['eval_results']]
+
+# plt.title('Distance covered in eval track')
+# plt.xlabel('Episode')
+# plt.ylabel('Distance (m)')
+# plt.plot([a for a in range(len(rewards_tr1)-4)],rewards_tr1[:-4], '--', label='baseline')
+# plt.plot([a for a in range(len(rewards_tr3))],rewards_tr3, '-.',label='BC-Driver')
+# plt.legend()
+# plt.show()
