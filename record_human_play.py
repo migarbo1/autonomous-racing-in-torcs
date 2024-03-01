@@ -50,7 +50,8 @@ if __name__ == '__main__':
             prev_steer = 0
 
 
-
+        if actions[0] == 0:
+            actions[0] = 0.15
         act_list.append(list(actions))
         obs, rew, done, _, _ = env.step(actions)
         obs_list.append(obs)
