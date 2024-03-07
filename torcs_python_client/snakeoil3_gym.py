@@ -114,7 +114,6 @@ def set_textmode(is_text = True):
 def set_tracks(track_list):
     global TRACKS
     TRACKS = track_list
-    print(TRACKS)
 
 @staticmethod
 def kill_torcs():

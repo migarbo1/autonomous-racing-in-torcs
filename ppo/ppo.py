@@ -423,3 +423,6 @@ class PPO:
                     torch.save(self.actor.state_dict(), './weights/ppo_actor.pth')
                     torch.save(self.critic.state_dict(), './weights/ppo_critic.pth')
                     print('Models saved')
+        
+        torch.save(self.actor.state_dict(), './weights/ppo_actor_last.pth')
+        torch.save(self.critic.state_dict(), './weights/ppo_critic_last.pth')

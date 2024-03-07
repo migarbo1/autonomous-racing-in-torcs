@@ -28,10 +28,11 @@ for n in ['record']:#['aalborg', 'suzuka', 'brondehach', 'corkscrew']:
 
     end_idx = np.argmax(rew)
 
-    obs = obs[:end_idx]
-    rew = rew[:end_idx]
-    action = action[:end_idx]
-    done = done[:end_idx]
+    #get lap steps
+    obs = obs[:end_idx-1]
+    rew = rew[:end_idx-1]
+    action = action[:end_idx-1]
+    done = done[:end_idx-1]
 
     print(f"obs: {len(obs)}")
     print(f"reward: {len(rew)}")

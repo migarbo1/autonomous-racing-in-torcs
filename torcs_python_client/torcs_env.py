@@ -170,9 +170,9 @@ class TorcsEnv:
         reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
             # + forward_view
 
-        if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
-            reward = reward + 100
-            self.last_lap_time = state['lastLapTime']
+        # if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
+        #     reward = reward + 100
+        #     self.last_lap_time = state['lastLapTime']
 
         # print('SPEED REWARD: ', speed_reward)
         # print('STEER REWARD: ', steer_reward)
@@ -183,17 +183,17 @@ class TorcsEnv:
 
     def compute_gear(self, speed):
         gear = 1
-        if speed > 110:
+        if speed > 95:
             gear = 2
-        if speed > 130:
+        if speed > 115:
             gear = 3
-        if speed > 180:
+        if speed > 165:
             gear = 4
-        if speed > 230:
+        if speed > 215:
             gear = 5
-        if speed > 260:
+        if speed > 245:
             gear = 6
-        if speed > 285:
+        if speed > 270:
             gear = 7
         # Gear computing for P406
         # if speed > 50:
