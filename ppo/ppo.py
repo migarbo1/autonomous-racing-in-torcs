@@ -50,8 +50,8 @@ class PPO:
 
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 9600 # 48
-        self.max_timesteps_per_episode = 3200 # 16
+        self.timesteps_per_batch = 19200 # 48
+        self.max_timesteps_per_episode = 6400 # 16
         self.gamma = 0.99
         self.n_updates_per_iteration = 5
         self.clip = 0.2
@@ -321,7 +321,7 @@ class PPO:
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
-            if self.use_human_data:
+            if self.use_human_data and random.random() > 0.5*(self.current_timesteps/max_timesteps):
                 obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE
