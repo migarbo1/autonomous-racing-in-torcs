@@ -1,16 +1,17 @@
 import time
 from torch.distributions import MultivariateNormal
-from .network import Actor, Critic
+from .network import ActorLSTM, CriticLSTM
 from torch.optim import Adam
 from torch.nn import MSELoss
 import numpy as np
 import random
 import pickle
 import torch
+import time
 import os
 
 
-class PPO:
+class PPOLSTM:
     def __init__(self, env, variance=0.35, test = False, use_human_data = False) -> None:
         # Set hyperparameters
         self._init_hyperparameters()
@@ -23,8 +24,8 @@ class PPO:
         self.use_human_data = use_human_data
 
         # Initialize actor and critic networks
-        self.actor = Actor(self.obs_dim, self.act_dim, test=test)
-        self.critic = Critic(self.obs_dim, 1, test=test)
+        self.actor = ActorLSTM(self.obs_dim, self.act_dim, test=test)
+        self.critic = CriticLSTM(self.obs_dim, 1, test=test)
         self.actor.to('cuda')
         self.critic.to('cuda')
         if os.path.isfile('./weights/ppo_actor.pth'):
@@ -62,7 +63,7 @@ class PPO:
         self.eval_max_timesteps = 15000
 
         # advanced hyper parameters 
-        self.num_minibatches = 6
+        self.num_minibatches = 12
         self.ent_coef = 0.05
         self.max_grad_norm = 0.5
         self.target_kl = 0.02 
@@ -71,8 +72,8 @@ class PPO:
         self.human_steps = 800
 
 
-    def get_action(self, state):
-        mean = self.actor(state)
+    def get_action(self, state, h, c):
+        mean, h, c = self.actor(state, h, c)
         
         # create the covariance matrix for continuous multi action space
         cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
@@ -91,11 +92,11 @@ class PPO:
         #         action[0] = -1
 
         if self.test:
-            return action.detach().cpu().numpy(), 1
+            return action.detach().cpu().numpy(), 1, h, c
 
         log_prob = distribution.log_prob(action)
         #detach because they are tensors
-        return action.detach().cpu().numpy(), log_prob.detach().cpu()
+        return action.detach().cpu().numpy(), log_prob.detach().cpu(), h, c
 
 
     def compute_future_rewards(self, rewards_batch):
@@ -128,8 +129,9 @@ class PPO:
         done = False
         self.test = True
         state, _ = self.env.reset(eval=only_practice)
+        h, c = None, None
         while not done and i < self.eval_max_timesteps:
-            action, log_prob = self.get_action(state)
+            action, log_prob, h, c = self.get_action(state, h, c)
             state, reward, done, _ ,_ = self.env.step(action)
 
             total_reward += reward
@@ -183,8 +185,10 @@ class PPO:
             ep_dones = []
 
             state, _ = self.env.reset()
+            h_a, c_a = None, None
+            h_c, c_c = None, None
             done = False
-
+            
             for _ in range(self.max_timesteps_per_episode):
 
                 ep_dones.append(done)
@@ -192,9 +196,9 @@ class PPO:
                 cur_timesteps_in_batch += 1
 
                 obs_batch.append(state)
-                action, log_prob = self.get_action(state)
+                action, log_prob, h_a, c_a = self.get_action(state, h_a, c_a)
                 
-                val = self.critic(state)
+                val, h_c, c_c = self.critic(state,  h_c, c_c)
 
                 state, reward, done, _ ,_ = self.env.step(action)
 
@@ -210,7 +214,7 @@ class PPO:
             rewards_batch.append(ep_rewards)
             val_batch.append(ep_vals)
             dones_batch.append(ep_dones)
-
+        
         self.env.kill_torcs()
 
         obs_batch = torch.tensor(np.array(obs_batch), dtype=torch.float)
@@ -222,10 +226,10 @@ class PPO:
 
     def evaluate(self, obs_batch, act_batch):
 
-        V = self.critic(obs_batch)
+        V, _, _ = self.critic(obs_batch)
 
         # get logprobs using last actor network
-        mean = self.actor(obs_batch)
+        mean, _, _ = self.actor(obs_batch)
 
         cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
         cov_mat = torch.diag(cov_var)
@@ -297,14 +301,15 @@ class PPO:
 
         cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
         cov_mat = torch.diag(cov_var)
-        
+        h_c, c_c = None, None
         for i in range(idx, idx+self.human_steps):
             action = torch.tensor(hd_actions[i], dtype=torch.float)
             distribution = MultivariateNormal(action, cov_mat)
             hd_logprobs.append(distribution.log_prob(action).detach().cpu())
             
             state = hd_obs[i]
-            hd_vals.append(self.critic(state).flatten())
+            v, h_c, c_c = self.critic(state, h_c, c_c)
+            hd_vals.append(v.flatten())
 
         complete_logprob_batch = torch.cat((logprob_batch, torch.tensor(hd_logprobs, dtype=torch.float).flatten()))
         complete_val_batch = val_batch + [hd_vals]
@@ -326,8 +331,8 @@ class PPO:
 
             # Compute Advantage using GAE
             advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)
-            V = self.critic(obs_batch).squeeze()
-            future_rewards_batch = advantage_k + V.detach()
+            V, _, _ = self.critic(obs_batch)
+            future_rewards_batch = advantage_k + V.squeeze().detach()
 
             # Normatize advantage to make PPO stable
             advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
@@ -339,28 +344,24 @@ class PPO:
             current_iterations += 1
 
             step = obs_batch.size(0)
-            indexes = np.arange(step)
-            minibatch_size = step // self.num_minibatches
 
             iteration_actor_loss = []
             iteration_critic_loss = []
-
+                
             self.lr_annealing(self.current_timesteps, max_timesteps)
             self.variance_decay(self.current_timesteps, max_timesteps)
 
             for _ in range(self.n_updates_per_iteration):
 
-                np.random.shuffle(indexes)
-                for start in range(0, step, minibatch_size):
-                    end = start + minibatch_size
-                    idx = indexes[start:end]
+                minibatches = self.create_minibatches(obs_batch, act_batch, logprob_batch, dones_batch, advantage_k, future_rewards_batch)
 
-                    # Get data from indexes
-                    mini_obs = obs_batch[idx]
-                    mini_acts = act_batch[idx]
-                    mini_logprobs = logprob_batch[idx]
-                    mini_ak = advantage_k[idx]
-                    mini_future_rewards = future_rewards_batch[idx]
+                for minibatch in minibatches:
+
+                    mini_obs = minibatch[0]
+                    mini_acts = minibatch[1]
+                    mini_logprobs = minibatch[2]
+                    mini_ak = minibatch[3]
+                    mini_future_rewards = minibatch[4]
 
                     # Compute pi_theta(a_t, s_t)
                     V, cur_logprob, entropy = self.evaluate(mini_obs, mini_acts)
@@ -426,3 +427,34 @@ class PPO:
         
         torch.save(self.actor.state_dict(), './weights/ppo_actor_last.pth')
         torch.save(self.critic.state_dict(), './weights/ppo_critic_last.pth')
+
+
+    def create_minibatches(self, obs_batch, act_batch, logprob_batch, dones_batch, advantage_k, future_rewards_batch):
+        minibatch_size = len(obs_batch) // self.num_minibatches #19200 / 12 = 1600
+        episode_end_idx = []
+        aux = 0
+        for a in dones_batch:
+            aux += len(a)
+            episode_end_idx.append(aux)
+        # print(episode_end_idx)
+
+        minibatches = []
+        start = 0
+        i = 0
+        end = 0
+
+        while end < episode_end_idx[-1]:
+            end = min(episode_end_idx[i]+1, start + minibatch_size)
+            # print(f'start:{start}, end:{end}')
+            minibatches.append([
+                obs_batch[start:end],
+                act_batch[start:end],
+                logprob_batch[start:end],
+                advantage_k[start:end],
+                future_rewards_batch[start:end],
+            ])
+            if end == episode_end_idx[i]+1:
+                i+=1
+            start = end
+        random.shuffle(minibatches)
+        return minibatches

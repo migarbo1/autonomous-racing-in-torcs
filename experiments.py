@@ -1,6 +1,6 @@
 import torcs_python_client.snakeoil3_gym as snakeoil 
 from torcs_python_client.torcs_env import TorcsEnv
-from ppo.ppo import PPO
+from ppo.ppo_lstm import PPOLSTM
 from pathlib import Path
 import numpy as np
 import torch
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         for i in range(11):
             print(f'rollout {i+1} of {11}')
             env = TorcsEnv(num_frames = num_frames)
-            model = PPO(env, test=True)
+            model = PPOLSTM(env, test=True)
             model.eval_max_timesteps = 50000
             try:
                 model.launch_eval(only_practice=False)

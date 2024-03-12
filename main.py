@@ -1,10 +1,10 @@
-from ppo.ppo import PPO
+from ppo.ppo_lstm import PPOLSTM
 from torcs_python_client.torcs_env import TorcsEnv
 import torch
 import sys
 import os
 
-def training_finished_procedure(env: TorcsEnv, model: PPO):
+def training_finished_procedure(env: TorcsEnv, model: PPOLSTM):
     env.training_data['total_training_timesteps'] += model.current_timesteps
     env.save_training_data()
     os.system(f'pkill torcs')
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     env = TorcsEnv(num_frames = num_frames)
     #TODO: make console parameter
     timesteps = 18000000
-    model = PPO(env, use_human_data=use_human_data)
+    model = PPOLSTM(env, use_human_data=use_human_data)
     try:
         model.learn(timesteps)
     except Exception as e:
