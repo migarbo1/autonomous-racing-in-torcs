@@ -1,4 +1,5 @@
 from ppo.ppo_lstm import PPOLSTM
+from ppo.ppo import PPO
 from torcs_python_client.torcs_env import TorcsEnv
 import torch
 import sys
@@ -17,7 +18,7 @@ if __name__ == '__main__':
     env = TorcsEnv(num_frames = num_frames)
     #TODO: make console parameter
     timesteps = 18000000
-    model = PPOLSTM(env, use_human_data=use_human_data)
+    model = PPO(env, use_human_data=use_human_data)
     try:
         model.learn(timesteps)
     except Exception as e:
