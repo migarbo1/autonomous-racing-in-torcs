@@ -15,12 +15,11 @@ PI = snakeoil.PI
 
 class TorcsEnv:
 
-    def __init__(self, create_client = False, num_frames=5) -> None:
-        # snakeoil.restart_torcs()
+    def __init__(self, create_client = False, num_frames=5, force_centerline=False, load_tr_data=True, join_accel_brake = True, speed_based_reward=True, focus = False) -> None:
 
         # Action order:[Accel&Brake, steer]  
-        action_lows = np.array([-1.0, -1.0])
-        action_highs = np.array([1.0, 1.0])
+        action_lows = np.array([-1.0, -1.0]) if join_accel_brake else np.array([0.0, 0.0, -1.0])
+        action_highs = np.array([1.0, 1.0]) if join_accel_brake else np.array([1.0, 1.0, 1.0])
         self.action_space = spaces.Box(low=action_lows, high=action_highs)
 
         self.num_frames = num_frames
@@ -40,19 +39,18 @@ class TorcsEnv:
         self.has_moved = False
         self.min_speed = 3/self.max_speed
 
-        self.training_data = self.load_training_data()
-
-        # self.vision_angles = [-90, -75, -60, -45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45, 60, 75, 90]
-        # self.vision_angles = [-45, -19, -12, -7, -4, -2.5, -1.7, -1, -.5, 0, .5, 1, 1.7, 2.5, 4, 7, 12, 19, 45]
-        # self.vision_angles = [-45, -32, -24, -12, -8, -6, -4, -2, -1, 0, 1, 2, 4, 6, 8, 12, 24, 32, 45]
-        self.vision_angles = [-45, -32, -23, -11, -7, -4, -2.8, -1.5, -.5, 0, .5, 1.5, 2.8, 4, 7, 11, 23, 32, 45]
+        self.training_data = self.load_training_data(load_tr_data)
     
         self.last_lap_time = 0
-        self.client = snakeoil.Client(p=3001) if create_client else None
+        self.client = snakeoil.Client(p=3001, focus=focus) if create_client else None
+
+        self.force_centerline = force_centerline
+        self.join_accel_brake = join_accel_brake
+        self.speed_based_reward = speed_based_reward
 
 
-    def load_training_data(self):
-        if os.path.isfile(f'{os.getcwd()}/training_data.pickle'):
+    def load_training_data(self, load_tr_data):
+        if os.path.isfile(f'{os.getcwd()}/training_data.pickle') and load_tr_data:
             with open(f'{os.getcwd()}/training_data.pickle', 'rb') as file:
                 return pickle.load(file)
         else:
@@ -65,13 +63,11 @@ class TorcsEnv:
 
 
     def step(self, actions: list):
-        # to think: how to smoothen steer movements -> if now it is -1 and action tells 0... ¿place in value function?  
+        
         done = False
 
         if isinstance(actions, np.ndarray):
             actions = self.action_array2dict(actions)
-
-        # print('Parsed actions:', actions)
 
         # set action dict to the selected actions by network
         for k, v in actions.items():
@@ -87,10 +83,9 @@ class TorcsEnv:
         self.client.get_servers_input()
         self.observation = self.parse_torcs_input(self.client.S.d)    
 
-        #TODO:
         reward = self.compute_reward(self.client.S.d)
 
-        # episode termination conditions: out of track or running backwards ¿small progress?
+        # episode termination conditions: out of track or running backwards
         if min(getattr(self.observation, 'track')) < 0 or \
             np.cos(getattr(self.observation, 'angle')) < 0 or \
             getattr(self.observation, 'speedX') < self.min_speed and self.has_moved or \
@@ -106,8 +101,6 @@ class TorcsEnv:
         self.time_step += 1
 
         self.previous_state = self.client.S.d.copy() # store full state instead of "observation" so we can track all values
-
-        # print('RECEIVED OBSERVATION:', self.observation)
 
         obs_array = self.observation2array(self.observation)
         self.append_state_to_stack(obs_array)
@@ -137,13 +130,6 @@ class TorcsEnv:
 
 
     def get_complete_obs(self):
-        # res = []
-
-        # for i in range(len(self.frame_stacking[-1])):
-        #     res.append(self.frame_stacking[-1][i])
-        #     res.append(self.frame_stacking[-1][i] - self.frame_stacking[0][i])
-        
-        # return res
         return np.array(self.frame_stacking).flatten()
 
 
@@ -155,28 +141,29 @@ class TorcsEnv:
 
     def compute_reward(self, state):
         # get speed of first frame of stack
-        prev_speed = self.frame_stacking[0][1]
-        speed_x = state['speedX']/self.max_speed
-        speed_y = state['speedY']/self.max_speed
+        reward = 0
         angle = state['angle']/PI
-        speed_dif = abs(speed_x - prev_speed)
-        speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
-        
-        # get angle of first frame of stack
-        prev_angle = self.frame_stacking[0][0]
-        angle_variation = 5*abs(angle - prev_angle) # TODO: el problema del waving puede ser que mira el t-5 y no el numero de veces que cambia el angulo entre t-5 y t
 
+        if self.speed_based_reward:
+            prev_speed = self.frame_stacking[0][1]
+            speed_x = state['speedX']/self.max_speed
+            speed_y = state['speedY']/self.max_speed
+            speed_dif = abs(speed_x - prev_speed)
+            if self.force_centerline:
+                speed_reward = 2*speed_dif + speed_x * (1 - abs(state['trackPos'])) * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
+            else:
+                speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
+            
+            # get angle of first frame of stack
+            prev_angle = self.frame_stacking[0][0]
+            angle_variation = 5*abs(angle - prev_angle) # TODO: el problema del waving puede ser que mira el t-5 y no el numero de veces que cambia el angulo entre t-5 y t
 
-        reward = speed_reward - angle_variation#- abs(state['trackPos']) #- angle_norm
-            # + forward_view
+            reward = speed_reward - angle_variation
 
-        # if state['lastLapTime'] > 0 and state['lastLapTime'] != self.last_lap_time:
-        #     reward = reward + 100
-        #     self.last_lap_time = state['lastLapTime']
-
-        # print('SPEED REWARD: ', speed_reward)
-        # print('STEER REWARD: ', steer_reward)
-        # print(f'sp_reward: {speed_reward:4f}; delta_sp: {speed_dif:4f}; delta_angle: {angle_variation:4f}; Reward: {reward:4f}')
+        else:
+            prev_dist = self.previous_state['distRaced'] if self.previous_state != None else 0
+            curr_dist = state['distRaced']
+            reward = (curr_dist-prev_dist) * np.cos(angle) * (1 - abs(state['trackPos']))
 
         return reward
 
@@ -230,17 +217,21 @@ class TorcsEnv:
 
 
     def action_array2dict(self, actions):
-        accel, brake = 0, 0
+        accel, brake, steer = 0, 0, 0
 
-        if actions[0] > 0:
-            accel = actions[0]
+        if self.join_accel_brake:
+            if actions[0] > 0:
+                accel = actions[0]
+            else:
+                brake = abs(actions[0])
+            steer = actions[1]
         else:
-            brake = abs(actions[0])
+            accel, brake, steer = actions
 
         res = {
             'accel': accel,
             'brake': brake, 
-            'steer': actions[1]
+            'steer': steer
             }
 
         return res

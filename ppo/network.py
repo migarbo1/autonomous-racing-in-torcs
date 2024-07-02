@@ -14,6 +14,7 @@ class Actor(nn.Module):
         self.output_layer = nn.Linear(128, out_dim)
 
         self.test = test
+        self.output_dim = out_dim
 
         self.drop1 = nn.Dropout(p=drop_rate)
         self.drop2 = nn.Dropout(p=drop_rate)
@@ -37,9 +38,28 @@ class Actor(nn.Module):
         
         out = self.output_layer(act3)
 
-        out = F.tanh(out)
+        if self.output_dim == 2:
+            out = F.tanh(out)
+        else:
+            if len(out.shape) == 1:
+                accel_brake = out[:2]
+                steer = torch.unsqueeze(out[2], dim=0)
+                act_tuple = (
+                    F.sigmoid(accel_brake),
+                    F.tanh(steer)
+                )
+                out = torch.cat(act_tuple, dim=0)
+            else:
+                accel_brake = out[:,:2]
+                steer = torch.unsqueeze(out[:,2], dim=1)
+                act_tuple = (
+                    F.sigmoid(accel_brake),
+                    F.tanh(steer)
+                )
+                out = torch.cat(act_tuple, dim=1)
 
         return out
+
 
 class Critic(nn.Module):
     def __init__(self, in_dim, out_dim, drop_rate = 0.1, test = True):

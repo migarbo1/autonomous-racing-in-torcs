@@ -153,7 +153,7 @@ def bargraph(x,mn,mx,w,c='X'):
     return '[%s]' % (nnc+npc+ppc+pnc)
 
 class Client():
-    def __init__(self,H=None,p=None,i=None,e=None,t=None,s=None,d=None):
+    def __init__(self,H=None,p=None,i=None,e=None,t=None,s=None,d=None, focus=False):
         self.host= 'localhost'
         self.port= 3001
         self.sid= 'SCR'
@@ -162,6 +162,7 @@ class Client():
         self.stage= 3 # 0=Warm-up, 1=Qualifying 2=Race, 3=unknown <Default=3>
         self.debug= False
         self.maxSteps= 100000  # 50steps/second
+        self.focus = focus
         # self.parse_the_command_line()
         if H: self.host= H
         if p: self.port= p
@@ -186,9 +187,11 @@ class Client():
         n_fail = 5
         while True:
             # This string establishes track sensor angles! You can customize them.
-            # a= "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"       # Initial test
+            if self.focus:
+                a = "-45 -32 -23 -11 -7 -4 -2.8 -1.5 -.5 0 .5 1.5 2.8 4 7 11 23 32 45"    
+            else:
+                a = "-90 -75 -60 -45 -30 -20 -15 -10 -5 0 5 10 15 20 30 45 60 75 90"       # Initial test
             # a= "-45 -19 -12 -7 -4 -2.5 -1.7 -1 -.5 0 .5 1 1.7 2.5 4 7 12 19 45"       # TODO: these are the angles used by all the comunity 
-            a= "-45 -32 -23 -11 -7 -4 -2.8 -1.5 -.5 0 .5 1.5 2.8 4 7 11 23 32 45"     # TODO: seccond test
 
             initmsg='%s(init %s)' % (self.sid,a)
 

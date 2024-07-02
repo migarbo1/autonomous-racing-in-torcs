@@ -11,9 +11,9 @@ import os
 
 
 class PPO:
-    def __init__(self, env, variance=0.35, test = False, use_human_data = False) -> None:
+    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False) -> None:
         # Set hyperparameters
-        self._init_hyperparameters()
+        self._init_hyperparameters(default_lr)
         
         # Get enviroment information
         self.env = env
@@ -21,22 +21,29 @@ class PPO:
         self.act_dim = env.action_space.shape[0]
 
         self.use_human_data = use_human_data
+        self.try_brake = try_brake
 
         # Initialize actor and critic networks
         self.actor = Actor(self.obs_dim, self.act_dim, test=test)
         self.critic = Critic(self.obs_dim, 1, test=test)
-        self.actor.to('cuda')
-        self.critic.to('cuda')
-        if os.path.isfile('./weights/ppo_actor.pth'):
+
+        self.model_name = model_name
+
+        if os.path.isfile(f'{model_name}_actor.pth'):
             print('loading actor weights ....')
-            self.actor.load_state_dict(torch.load('./weights/ppo_actor.pth'))
-        if os.path.isfile('./weights/ppo_critic.pth'):
+            self.actor.load_state_dict(torch.load(f'{model_name}_actor.pth'))
+
+        if os.path.isfile(f'{model_name}_critic.pth'):
             print('loading critic weights ....')
-            self.critic.load_state_dict(torch.load('./weights/ppo_critic.pth'))
+            self.critic.load_state_dict(torch.load(f'{model_name}_critic.pth'))
+
         if self.use_human_data and os.path.isfile(f'{os.getcwd()}/human_data/formatted.pickle'):
             print('loading human data...')
             with open(f'{os.getcwd()}/human_data/formatted.pickle', 'rb') as file:
                 self.human_data = pickle.load(file)
+                
+        self.actor.to('cuda')
+        self.critic.to('cuda')
 
         self.variance = variance if not test else 0.05
         self.curr_variance = variance if not test else 0.05
@@ -49,20 +56,20 @@ class PPO:
         self.current_timesteps = 0
 
 
-    def _init_hyperparameters(self):
+    def _init_hyperparameters(self, lr):
         self.timesteps_per_batch = 19200 # 48
         self.max_timesteps_per_episode = 6400 # 16
         self.gamma = 0.99
         self.n_updates_per_iteration = 5
         self.clip = 0.2
-        self.lr = 0.005
+        self.lr = lr
         self.save_ratio = 3
 
         self.eval_ratio = 3
         self.eval_max_timesteps = 15000
 
         # advanced hyper parameters 
-        self.num_minibatches = 6
+        self.num_minibatches = 12
         self.ent_coef = 0.05
         self.max_grad_norm = 0.5
         self.target_kl = 0.02 
@@ -84,11 +91,20 @@ class PPO:
         action = distribution.sample()
 
         # stochastic breaking
-        # if not self.test:
-        #     rate = (self.current_timesteps*2)/self.max_timesteps if self.current_timesteps < self.max_timesteps/2 else 1-self.current_timesteps/self.max_timesteps
-        #     if random.random() < 0.1 * rate:
-        #         print('exploration: ', rate*0.1)
-        #         action[0] = -1
+        if not self.test and self.try_brake:
+            rate = (self.current_timesteps*2)/self.max_timesteps if self.current_timesteps < self.max_timesteps/2 else 1-self.current_timesteps/self.max_timesteps
+            if random.random() < 0.1 * rate:
+                if self.act_dim ==2:
+                    action[0] = min(rate*-0.1, action[0])
+                else:
+                    action[1] = min(rate*0.1, action[1])
+
+        # prevent the agent from braking if it's driving at or slower than the min
+        if not self.test and state[-23] < 3/self.env.max_speed: 
+            if self.act_dim ==2:
+                action[0] = max(0, action[0])
+            else:
+                action[1] = 0
 
         if self.test:
             return action.detach().cpu().numpy(), 1
@@ -162,8 +178,9 @@ class PPO:
         eval_results['observation_rollout'] = obs_list
         eval_results['all_steps_completed'] = i==self.eval_max_timesteps
 
-        self.env.training_data['eval_results'].append(eval_results)
+        # self.env.training_data['eval_results'].append(eval_results)
         self.test = False
+        return eval_results
 
 
     def rollout(self):
@@ -401,28 +418,29 @@ class PPO:
                     
                     self.critic_opt.step()
 
-                if approx_kl > self.target_kl:
-                    break
+                # if approx_kl > self.target_kl:
+                #     print('break')
+                #     break
 
-            iteration_avg_actor_loss = np.mean(np.array(iteration_actor_loss))
-            iteration_avg_critic_loss = np.mean(np.array(iteration_critic_loss))
+            # iteration_avg_actor_loss = np.mean(np.array(iteration_actor_loss))
+            # iteration_avg_critic_loss = np.mean(np.array(iteration_critic_loss))
 
-            self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
-            self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
+            # self.env.training_data['actor_episodic_avg_loss'].append(iteration_avg_actor_loss)
+            # self.env.training_data['critic_episodic_avg_loss'].append(iteration_avg_critic_loss)
 
             print('current iteration: ', current_iterations)
 
             if current_iterations % self.eval_ratio == 0:
-                self.launch_eval()
-                rollout_reward = sum(self.env.training_data['eval_results'][-1]['rewards_per_timestep'][:-1])
+                res = self.launch_eval()
+                rollout_reward = sum(res['rewards_per_timestep'][:-1])
                 if rollout_reward > best_reward:
                     best_reward = rollout_reward
-                    self.env.training_data['total_training_timesteps'] += timesteps_since_save
-                    self.env.save_training_data()
+                    # self.env.training_data['total_training_timesteps'] += timesteps_since_save
+                    # self.env.save_training_data()
                     timesteps_since_save = 0
-                    torch.save(self.actor.state_dict(), './weights/ppo_actor.pth')
-                    torch.save(self.critic.state_dict(), './weights/ppo_critic.pth')
+                    torch.save(self.actor.state_dict(), f'{self.model_name}_actor.pth')
+                    torch.save(self.critic.state_dict(), f'{self.model_name}_critic.pth')
                     print('Models saved')
         
-        torch.save(self.actor.state_dict(), './weights/ppo_actor_last.pth')
-        torch.save(self.critic.state_dict(), './weights/ppo_critic_last.pth')
+        torch.save(self.actor.state_dict(), f'{self.model_name}_last_actor.pth')
+        torch.save(self.critic.state_dict(), f'{self.model_name}_last_critic.pth')
