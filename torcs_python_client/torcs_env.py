@@ -142,7 +142,7 @@ class TorcsEnv:
     def compute_reward(self, state):
         # get speed of first frame of stack
         reward = 0
-        angle = state['angle']/PI
+        angle = state['angle']#/PI
 
         if self.speed_based_reward:
             prev_speed = self.frame_stacking[0][1]
@@ -150,9 +150,9 @@ class TorcsEnv:
             speed_y = state['speedY']/self.max_speed
             speed_dif = abs(speed_x - prev_speed)
             if self.force_centerline:
-                speed_reward = 2*speed_dif + speed_x * (1 - abs(state['trackPos'])) * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
+                speed_reward = 2*speed_dif + speed_x * (1 - abs(state['trackPos'])) * (np.cos(angle) - abs(np.sin(angle))) - abs(speed_y)*np.cos(angle)
             else:
-                speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - np.sin(abs(angle))) - abs(speed_y)*np.cos(angle)
+                speed_reward = 2*speed_dif + speed_x * (np.cos(angle) - abs(np.sin(angle))) - abs(speed_y)*np.cos(angle)
             
             # get angle of first frame of stack
             prev_angle = self.frame_stacking[0][0]
