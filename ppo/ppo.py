@@ -11,7 +11,7 @@ import os
 
 
 class PPO:
-    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False) -> None:
+    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False, human_data_file='') -> None:
         # Set hyperparameters
         self._init_hyperparameters(default_lr)
         
@@ -37,9 +37,9 @@ class PPO:
             print('loading critic weights ....')
             self.critic.load_state_dict(torch.load(f'{model_name}_critic.pth'))
 
-        if self.use_human_data and os.path.isfile(f'{os.getcwd()}/human_data/formatted.pickle'):
+        if self.use_human_data and os.path.isfile(human_data_file):
             print('loading human data...')
-            with open(f'{os.getcwd()}/human_data/formatted.pickle', 'rb') as file:
+            with open(human_data_file, 'rb') as file:
                 self.human_data = pickle.load(file)
                 
         self.actor.to('cuda')
@@ -338,7 +338,7 @@ class PPO:
         while self.current_timesteps < max_timesteps:
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
-            if self.use_human_data and random.random() > 0.5*(self.current_timesteps/max_timesteps):
+            if self.use_human_data and random.random() > 0.75*(self.current_timesteps/max_timesteps):
                 obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE

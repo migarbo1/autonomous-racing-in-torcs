@@ -18,14 +18,15 @@ def training_finished_procedure(env: TorcsEnv, model: PPOLSTM):
 @click.option('--force_centerline', '-c', is_flag=True, default=False, help='Force the agent to learn to drive through the middle of the track. Only available for speed reward')
 @click.option('--join_accel_brake', '-j', is_flag=True, default=False, help='Combine accel and brake accions into a single one')
 @click.option('--model_name', '-n', default='./weights/ppo', help='The name of the model file')
+@click.option('--hf', default='/human_data/formatted.pickle', help='The name of the model file')
 @click.option('--variance', '-v', default=0.35, help='Exploration factor for mean sampling')
 @click.option('--try_brake', is_flag=True, default=False, help='Exploration mechanism to force brake usage')
 @click.option('--focus', is_flag=True, default=False, help='Narrows the view field')
 @click.option('--lr', default=0.005, help='Leraning rate for the PPO algorithm')
 @click.option('--reward', type=click.Choice(['speed', 'distance'], case_sensitive=False), default='speed')
-def main(num_frames, use_human_data, timesteps, force_centerline, join_accel_brake, model_name, variance, try_brake, focus, lr, reward):
+def main(num_frames, use_human_data, timesteps, force_centerline, join_accel_brake, model_name, variance, try_brake, focus, lr, reward, hf):
     
-    print(num_frames, use_human_data, timesteps, force_centerline, join_accel_brake, model_name, variance, try_brake, focus, lr, reward)
+    print(num_frames, use_human_data, timesteps, force_centerline, join_accel_brake, model_name, variance, try_brake, focus, lr, reward, hf)
 
     torch.set_default_device('cuda')
     env = TorcsEnv(
@@ -39,6 +40,7 @@ def main(num_frames, use_human_data, timesteps, force_centerline, join_accel_bra
     model = PPO(
         env, 
         use_human_data=use_human_data,
+        human_data_file = hf,
         variance=variance,
         try_brake=try_brake,
         default_lr=lr,
