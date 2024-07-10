@@ -45,8 +45,10 @@ class PPO:
         self.actor.to('cuda')
         self.critic.to('cuda')
 
-        self.variance = variance if not test else 0.05
-        self.curr_variance = variance if not test else 0.05
+        self.min_variance = 0.01
+
+        self.variance = variance if not test else self.min_variance
+        self.curr_variance = variance if not test else self.min_variance
 
         # Define the optimizers
         self.actor_opt = Adam(self.actor.parameters(), lr=self.lr)
@@ -264,7 +266,7 @@ class PPO:
     def variance_decay(self, cur_timesteps, max_timesteps):
         frac = (cur_timesteps - 1.0) / max_timesteps
         self.curr_variance = self.variance * (1 - frac)
-        self.curr_variance = max(self.curr_variance, 0.05)
+        self.curr_variance = max(self.curr_variance, self.min_variance)
 
 
     def compute_gae(self, rewards_in_batch, values_in_batch, dones_in_batch):

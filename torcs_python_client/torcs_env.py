@@ -74,7 +74,7 @@ class TorcsEnv:
             self.client.R.d[k] = v
         
         # set automatic gear
-        self.client.R.d['gear'] = self.compute_gear(self.client.S.d['speedX'])
+        self.client.R.d['gear'] = self.compute_gear(self.client.S.d['rpm'], self.client.S.d['gear'])
 
         # Apply the Agent's action into torcs
         self.client.respond_to_server()
@@ -168,20 +168,30 @@ class TorcsEnv:
         return reward
 
 
-    def compute_gear(self, speed):
-        gear = 1
-        if speed > 95:
-            gear = 2
-        if speed > 115:
-            gear = 3
-        if speed > 165:
-            gear = 4
-        if speed > 215:
-            gear = 5
-        if speed > 245:
-            gear = 6
-        if speed > 270:
-            gear = 7
+    def compute_gear(self, rpm, gear):
+        # if float(rpm) > 15500:
+        #     gear += 1
+        # if float(rpm) < 7500 and gear > 1:
+        #     gear -= 1
+        if float(rpm) > 7500:
+            gear += 1
+        if float(rpm) < 3750 and gear > 1:
+            gear -= 1
+        if gear == 0:
+            gear = 1
+        
+        # if speed > 95:
+        #     gear = 2
+        # if speed > 115:
+        #     gear = 3
+        # if speed > 165:
+        #     gear = 4
+        # if speed > 215:
+        #     gear = 5
+        # if speed > 245:
+        #     gear = 6
+        # if speed > 270:
+        #     gear = 7
         # Gear computing for P406
         # if speed > 50:
         #     gear = 2
@@ -192,7 +202,7 @@ class TorcsEnv:
         # if speed > 160:
         #     gear = 5
         # Gear computing for trb1
-        # if speed > 75:
+        # if speed > 80:
         #     gear = 2
         # if speed > 120:
         #     gear = 3
