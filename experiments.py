@@ -6,9 +6,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import click
-import time
 import math
-import sys
 import os
 
 def change_track(track, prev_track):
@@ -64,8 +62,8 @@ def main(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode
             model_name=model_name
         )
         model.eval_max_timesteps = timesteps
-        for i in range(11):
-            print(f'rollout {i+1} of {11}')
+        for i in range(7):
+            print(f'rollout {i+1} of {7}')
             try:
                 res = model.launch_eval(only_practice=False)
                 env.kill_torcs()

@@ -11,7 +11,7 @@ import os
 
 
 class PPO:
-    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False, human_data_file='') -> None:
+    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False, human_data_file='', human_steps = 0) -> None:
         # Set hyperparameters
         self._init_hyperparameters(default_lr)
         
@@ -54,6 +54,7 @@ class PPO:
 
         self.test = test
         self.current_timesteps = 0
+        self.human_steps = human_steps
 
 
     def _init_hyperparameters(self, lr):
@@ -74,8 +75,6 @@ class PPO:
         self.max_grad_norm = 0.5
         self.target_kl = 0.02 
         self.lamda = 0.98
-
-        self.human_steps = 800
 
 
     def get_action(self, state):
@@ -202,7 +201,7 @@ class PPO:
             state, _ = self.env.reset()
             done = False
 
-            for _ in range(self.max_timesteps_per_episode):
+            for k in range(self.max_timesteps_per_episode):
 
                 ep_dones.append(done)
 
@@ -223,7 +222,7 @@ class PPO:
                 if done:
                     break
 
-            ep_lengths_batch.append(cur_timesteps_in_batch + 1)
+            ep_lengths_batch.append(k + 1)
             rewards_batch.append(ep_rewards)
             val_batch.append(ep_vals)
             dones_batch.append(ep_dones)
@@ -295,7 +294,7 @@ class PPO:
     def add_human_data(self, obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch):
         selected_human_data = random.sample(self.human_data, 1)[0]
 
-        hd_obs = selected_human_data[0]
+        hd_obs = np.array(selected_human_data[0])
         hd_reward = selected_human_data[1]
         hd_actions = selected_human_data[2]
         hd_done = selected_human_data[3]
@@ -336,9 +335,10 @@ class PPO:
         best_reward = -np.inf
         self.max_timesteps = max_timesteps
         while self.current_timesteps < max_timesteps:
+            print(f'Current timesteps: {self.current_timesteps} out of {max_timesteps} | {self.current_timesteps/max_timesteps*100:.2f}%')
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
 
-            if self.use_human_data and random.random() > 0.75*(self.current_timesteps/max_timesteps):
+            if self.use_human_data and random.random() > 0.5*(self.current_timesteps/max_timesteps):
                 obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE
