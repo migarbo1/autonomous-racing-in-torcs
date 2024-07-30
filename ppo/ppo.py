@@ -259,7 +259,7 @@ class PPO:
     def lr_annealing(self, cur_timesteps, max_timesteps):
         frac = (cur_timesteps - 1.0) / max_timesteps
         new_lr = self.lr * (1.0 - frac)
-        new_lr = max(new_lr, 0.0)
+        new_lr = max(new_lr, 0.000001)
         self.actor_opt.param_groups[0]["lr"] = new_lr
         self.critic_opt.param_groups[0]["lr"] = new_lr
 
