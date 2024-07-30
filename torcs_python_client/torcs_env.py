@@ -169,14 +169,14 @@ class TorcsEnv:
 
 
     def compute_gear(self, rpm, gear):
-        # if float(rpm) > 15500:
-        #     gear += 1
-        # if float(rpm) < 7500 and gear > 1:
-        #     gear -= 1
-        if float(rpm) > 7500:
+        if float(rpm) > 15500:
             gear += 1
-        if float(rpm) < 3750 and gear > 1:
+        if float(rpm) < 6500 and gear > 1:
             gear -= 1
+        # if float(rpm) > 7500:
+        #     gear += 1
+        # if float(rpm) < 3750 and gear > 1:
+        #     gear -= 1
         if gear == 0:
             gear = 1
         

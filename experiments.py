@@ -35,8 +35,9 @@ def write_results(results, output_file):
 @click.option('--focus', is_flag=True, default=False, help='Narrows the view field')
 @click.option('--visual_mode', '-v', is_flag=True, default=False, help='show torcs visual interface')
 @click.option('--output_file', default='results', help='The name of the results file')
-def main(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode, output_file):
-    print(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode, output_file)
+@click.option('--min_variance', default=0.05, help='Minimum value for exploration factor for mean sampling')
+def main(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode, output_file, min_variance):
+    print(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode, output_file, min_variance)
     torch.set_default_device('cuda')
     textmode = not visual_mode
     snakeoil.set_textmode(textmode)
@@ -59,7 +60,8 @@ def main(num_frames, timesteps, join_accel_brake, model_name, focus, visual_mode
         model = PPO(
             env, 
             test=True,
-            model_name=model_name
+            model_name=model_name,
+            min_variance=min_variance
         )
         model.eval_max_timesteps = timesteps
         for i in range(7):

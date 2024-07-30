@@ -11,7 +11,7 @@ import os
 
 
 class PPO:
-    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False, human_data_file='', human_steps = 0) -> None:
+    def __init__(self, env, variance=0.35, test = False, use_human_data = False, default_lr = 0.005, model_name='ppo', try_brake = False, human_data_file='', human_steps = 0, min_variance = 0.05) -> None:
         # Set hyperparameters
         self._init_hyperparameters(default_lr)
         
@@ -45,7 +45,7 @@ class PPO:
         self.actor.to('cuda')
         self.critic.to('cuda')
 
-        self.min_variance = 0.01
+        self.min_variance = min_variance
 
         self.variance = variance if not test else self.min_variance
         self.curr_variance = variance if not test else self.min_variance
