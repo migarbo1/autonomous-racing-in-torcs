@@ -1,5 +1,6 @@
-import pickle
 import numpy as np
+import pickle
+import click
 import sys
 import os
 
@@ -18,20 +19,24 @@ def compute_distbased_reward(angle, track_pos, dist_raced, prev_dist_raced):
 
     return (dist_raced-prev_dist_raced) * np.cos(angle) * (1 - abs(track_pos))
 
-
-if __name__ == '__main__':
+@click.command()
+@click.option('--num_frames', '-f', default=1, help='Number of frames to be stacked in an observation')
+@click.option('--reward_type', type=click.Choice(['speed', 'distance'], case_sensitive=False), default='speed')
+@click.option('--join_accel_brake', '-j', is_flag=True, default=False, help='Combine accel and brake accions into a single one')
+@click.option('--prefix', '-p', default='./human_data', help='folder containing the files')
+def main(num_frames, reward_type, join_accel_brake, prefix):
+    print(num_frames, reward_type, join_accel_brake, prefix)
     observation_list = []
     action_list = []
     done_list = []
     reward_list = []
-    use_fs =  len(sys.argv) > 3 and sys.argv[3] == 'True'
-    print(use_fs)
+    use_fs =  int(num_frames) > 1
 
-    for obs_file in ['./human_data/human_wheel_focus.txt']:#,'./human_data/human_bron_focus.txt','./human_data/human_cork_focus.txt','./human_data/human_wheel_focus.txt']:
+    for obs_file in ['aalborg', 'bron', 'cork', 'wheel']:
         lines = []
-        fs = [np.zeros(25,) for _ in range(5)]
+        fs = [np.zeros(25,) for _ in range(num_frames)]
 
-        with open(obs_file, 'r') as file:
+        with open(f'{prefix}_{obs_file}.txt', 'r') as file:
             lines = file.readlines()
 
         prev_dist_raced = 0
@@ -61,8 +66,7 @@ if __name__ == '__main__':
                 speed_y/300.,
                 speed_z/300.,
                 track_pos,
-                *track,
-                dist_raced
+                *track
             ]
 
             if use_fs:
@@ -75,16 +79,23 @@ if __name__ == '__main__':
             else:
                 observation_list.append(observation)
             
-            action = [
-                ab,
-                # accel,
-                # brake,
-                steer
-            ]
+            if join_accel_brake: 
+                action = [
+                    ab,
+                    steer
+                ]
+            else:
+                action = [
+                    accel,
+                    brake,
+                    steer
+                ]
             action_list.append(action)
 
-            # reward = compute_spbased_reward(speed_x/300., speed_y/300., angle, prev_speed, prev_angle)
-            reward = compute_distbased_reward(angle, track_pos, dist_raced, prev_dist_raced)
+            if reward_type == 'speed':
+                reward = compute_spbased_reward(speed_x/300., speed_y/300., angle, prev_speed, prev_angle)
+            else:
+                reward = compute_distbased_reward(angle, track_pos, dist_raced, prev_dist_raced)
             reward_list.append(reward)
             
             prev_dist_raced = dist_raced
@@ -99,7 +110,10 @@ if __name__ == '__main__':
     formatted_human_data = []
     formatted_human_data.append(res)
 
-    with open(sys.argv[2], 'wb') as file:
+    with open(f'{prefix}_formatted.pickle', 'wb') as file:
         pickle.dump(formatted_human_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
+
+if __name__ == '__main__':
+    main()
 
