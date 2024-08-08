@@ -69,7 +69,7 @@ class PPO:
         self.save_ratio = 3
 
         self.eval_ratio = 3
-        self.eval_max_timesteps = 15000
+        self.eval_max_timesteps = 19200
 
         # advanced hyper parameters 
         self.num_minibatches = 12
@@ -302,13 +302,21 @@ class PPO:
         hd_done = selected_human_data[3]
 
         idx = random.randint(0, len(hd_obs) - self.human_steps) - 1
+
+        #if random selects a done state, then select next
+        idx = idx + 1 if hd_done[idx] else idx
+
+        # if there is a done in between, break the episopde there
+        end_idx = idx+self.human_steps
+        if hd_done[idx:end_idx].__contains__(True):
+            end_idx = list(hd_done[idx:end_idx]).index(True)
         
-        complete_obs_batch = torch.cat((obs_batch, torch.tensor(hd_obs[idx:idx+self.human_steps], dtype=torch.float)))
-        complete_act_batch = torch.cat((act_batch, torch.tensor(hd_actions[idx:idx+self.human_steps], dtype=torch.float)))
+        complete_obs_batch = torch.cat((obs_batch, torch.tensor(hd_obs[idx:end_idx], dtype=torch.float)))
+        complete_act_batch = torch.cat((act_batch, torch.tensor(hd_actions[idx:end_idx], dtype=torch.float)))
         
         #tecnicament es com si sols tingueres un episodi i el ficares en la llista de episodis
-        complete_done_batch = dones_batch + [hd_done[idx:idx+self.human_steps]]
-        complete_rew_batch =  rewards_batch + [hd_reward[idx:idx+self.human_steps]]
+        complete_done_batch = dones_batch + [hd_done[idx:end_idx]]
+        complete_rew_batch =  rewards_batch + [hd_reward[idx:end_idx]]
 
         hd_logprobs = []
         hd_vals = []
@@ -316,7 +324,7 @@ class PPO:
         cov_var = torch.full(size=(self.act_dim,), fill_value=self.curr_variance)
         cov_mat = torch.diag(cov_var)
         
-        for i in range(idx, idx+self.human_steps):
+        for i in range(idx, end_idx):
             action = torch.tensor(hd_actions[i], dtype=torch.float)
             distribution = MultivariateNormal(action, cov_mat)
             hd_logprobs.append(distribution.log_prob(action).detach().cpu())
@@ -331,6 +339,13 @@ class PPO:
         
 
     def learn(self, max_timesteps):
+        if self.use_human_data:
+            self.learn_with_human_data(max_timesteps)
+        else: 
+            self.learn_without_human_data(max_timesteps)
+
+
+    def learn_without_human_data(self, max_timesteps):
         self.current_timesteps = 0
         current_iterations = 0
         timesteps_since_save = 0
@@ -339,9 +354,6 @@ class PPO:
         while self.current_timesteps < max_timesteps:
             print(f'Current timesteps: {self.current_timesteps} out of {max_timesteps} | {self.current_timesteps/max_timesteps*100:.2f}%')
             obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
-
-            if self.use_human_data and random.random() > 0.5*(self.current_timesteps/max_timesteps):
-                obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
 
             # Compute Advantage using GAE
             advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)
@@ -369,10 +381,11 @@ class PPO:
 
             for _ in range(self.n_updates_per_iteration):
 
-                np.random.shuffle(indexes)
-                for start in range(0, step, minibatch_size):
-                    end = start + minibatch_size
-                    idx = indexes[start:end]
+                # np.random.shuffle(indexes)
+                grouped_idx = [indexes[i:i + minibatch_size] for i in range(0, len(indexes), minibatch_size)]
+                np.random.shuffle(grouped_idx)
+
+                for idx in grouped_idx:
 
                     # Get data from indexes
                     mini_obs = obs_batch[idx]
@@ -439,6 +452,136 @@ class PPO:
                     best_reward = rollout_reward
                     # self.env.training_data['total_training_timesteps'] += timesteps_since_save
                     # self.env.save_training_data()
+                    timesteps_since_save = 0
+                    torch.save(self.actor.state_dict(), f'{self.model_name}_actor.pth')
+                    torch.save(self.critic.state_dict(), f'{self.model_name}_critic.pth')
+                    print('Models saved')
+        
+        torch.save(self.actor.state_dict(), f'{self.model_name}_last_actor.pth')
+        torch.save(self.critic.state_dict(), f'{self.model_name}_last_critic.pth')
+            
+
+
+    def learn_with_human_data(self, max_timesteps):
+        self.current_timesteps = 0
+        current_iterations = 0
+        timesteps_since_save = 0
+        best_reward = -np.inf
+        self.max_timesteps = max_timesteps
+        while self.current_timesteps < max_timesteps:
+            print(f'Current timesteps: {self.current_timesteps} out of {max_timesteps} | {self.current_timesteps/max_timesteps*100:.2f}%')
+            obs_batch, act_batch, logprob_batch, rewards_batch, ep_lengths_batch, val_batch, dones_batch = self.rollout()
+
+            h_obs_batch, h_act_batch, h_rewards_batch, h_val_batch, h_dones_batch = [], [], [], [], []
+
+            include_human_data_in_batch = random.random() > 0.5*(self.current_timesteps/max_timesteps)
+
+            if include_human_data_in_batch:
+                h_obs_batch, h_act_batch, _, h_rewards_batch, h_val_batch, h_dones_batch = self.add_human_data(obs_batch, act_batch, logprob_batch, rewards_batch, val_batch, dones_batch)
+            else:
+                h_obs_batch, h_act_batch, h_rewards_batch, h_val_batch, h_dones_batch = obs_batch, act_batch, rewards_batch, val_batch, dones_batch 
+
+            # Compute Advantage using GAE
+            advantage_k = self.compute_gae(rewards_batch, val_batch, dones_batch)
+            V = self.critic(obs_batch).squeeze()
+            future_rewards_batch = advantage_k + V.detach()
+
+            if include_human_data_in_batch:
+                h_advantage_k = self.compute_gae(h_rewards_batch, h_val_batch, h_dones_batch)
+                h_V = self.critic(h_obs_batch).squeeze()
+                h_future_rewards_batch = h_advantage_k + h_V.detach()
+            else:
+                h_future_rewards_batch = future_rewards_batch
+
+            # Normatize advantage to make PPO stable
+            advantage_k = (advantage_k - advantage_k.mean()) / (advantage_k.std() + 1e-10)
+            
+            timesteps_in_batch = np.sum(ep_lengths_batch)
+            self.current_timesteps += timesteps_in_batch
+            timesteps_since_save += timesteps_in_batch
+
+            current_iterations += 1
+
+            step = obs_batch.size(0)
+            indexes = np.arange(step)
+            human_indexes = np.arange(h_obs_batch.size(0))
+            minibatch_size = step // self.num_minibatches
+
+            self.lr_annealing(self.current_timesteps, max_timesteps)
+            self.variance_decay(self.current_timesteps, max_timesteps)
+
+            for _ in range(self.n_updates_per_iteration):
+
+                # np.random.shuffle(indexes)
+                grouped_idx = [indexes[i:i + minibatch_size] for i in range(0, len(indexes), minibatch_size)]
+                human_grouped_idx = [human_indexes[i:i + minibatch_size] for i in range(0, len(human_indexes), minibatch_size)]
+                np.random.shuffle(grouped_idx)
+                np.random.shuffle(human_grouped_idx)
+
+                for i in range(len(human_grouped_idx)):
+                    if i < len(grouped_idx):
+                        idx = grouped_idx[i]
+
+                        # Get data from indexes
+                        mini_obs = obs_batch[idx]
+                        mini_acts = act_batch[idx]
+                        mini_logprobs = logprob_batch[idx]
+                        mini_ak = advantage_k[idx]
+                        mini_future_rewards = future_rewards_batch[idx]
+
+                        # Compute pi_theta(a_t, s_t)
+                        V, cur_logprob, entropy = self.evaluate(mini_obs, mini_acts)
+
+                        # compute ratios
+                        log_ratios = cur_logprob - mini_logprobs
+                        ratios = torch.exp(log_ratios)
+
+                        approx_kl = ((ratios - 1) - log_ratios).mean()
+
+                        # Compute surrogate losses
+                        surr_1 = ratios * mini_ak
+                        # Clamp == clip
+                        surr_2 = torch.clamp(ratios, 1-self.clip, 1+self.clip) * mini_ak
+
+                        # compute losses for both networks
+                        actor_loss = (-torch.min(surr_1, surr_2)).mean()
+                        # entropy regularization for actor network
+                        entropy_loss = entropy.mean()
+                        actor_loss = actor_loss - self.ent_coef * entropy_loss
+                    
+
+                        # Propagate loss through actor network
+                        self.actor_opt.zero_grad()
+                        actor_loss.backward(retain_graph=True) #flag needed -> avoids buffer already free error
+                        torch.nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
+                        self.actor_opt.step()
+
+                    if i < len(human_grouped_idx):
+                        h_idx = human_grouped_idx[i]
+
+                        # Get data from indexes
+                        mini_obs = h_obs_batch[h_idx]
+                        mini_acts = h_act_batch[h_idx]
+                        mini_future_rewards = h_future_rewards_batch[h_idx]
+
+                        V, cur_logprob, entropy = self.evaluate(mini_obs, mini_acts)
+
+                        critic_loss = MSELoss()(V, mini_future_rewards)
+
+                        #compute gradients and propagate loss though critic
+                        self.critic_opt.zero_grad()
+                        critic_loss.backward()
+                        torch.nn.utils.clip_grad_norm_(self.critic.parameters(), self.max_grad_norm)
+                        
+                        self.critic_opt.step()
+
+            print('current iteration: ', current_iterations)
+
+            if current_iterations % self.eval_ratio == 0:
+                res = self.launch_eval()
+                rollout_reward = sum(res['rewards_per_timestep'][:-1])
+                if rollout_reward > best_reward:
+                    best_reward = rollout_reward
                     timesteps_since_save = 0
                     torch.save(self.actor.state_dict(), f'{self.model_name}_actor.pth')
                     torch.save(self.critic.state_dict(), f'{self.model_name}_critic.pth')

@@ -54,6 +54,9 @@ def main(num_frames, use_human_data, timesteps, force_centerline, join_accel_bra
         model.learn(timesteps)
     except Exception as e:
         print(f'ERROR: {e}')
+        with open('error_log.txt', 'w') as file:
+            file.write(f'ERROR: {e}')
+
         training_finished_procedure(env, model)
     training_finished_procedure(env, model)
 

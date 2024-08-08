@@ -116,10 +116,9 @@ def main(num_frames, reward_type, join_accel_brake, prefix):
     formatted_human_data = []
     formatted_human_data.append(res)
 
-    with open(f'{prefix}_formatted.pickle', 'wb') as file:
+    with open(f'{prefix}_{reward_type}_formatted.pickle', 'wb') as file:
         pickle.dump(formatted_human_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
     main()
-
